@@ -1,7 +1,9 @@
 <<<<<<< HEAD
+
 # RMC-Frontend
-Frontend repo for NFT Certificates POC.
-=======
+
+# Frontend repo for NFT Certificates POC.
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -14,4 +16,5 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
->>>>>>> 188e24f0b00c2a261793daab591399d2ea1f60d6
+
+> > > > > > > 188e24f0b00c2a261793daab591399d2ea1f60d6
