@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConnectWallet from "./ConnectWallet";
 
 const Header = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -39,21 +40,7 @@ const Header = () => {
         </div>
 
         {/* Connect/Disconnect Button */}
-        {isConnected ? (
-          <button
-            onClick={disconnectWallet}
-            className="bg-red-500 px-4 py-2 rounded-md"
-          >
-            Disconnect
-          </button>
-        ) : (
-          <button
-            onClick={connectWallet}
-            className="bg-green-500 px-4 py-2 rounded-md"
-          >
-            Connect Wallet
-          </button>
-        )}
+        <ConnectWallet />
       </div>
     </header>
   );
