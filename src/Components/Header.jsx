@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
+import { useState } from "react";
+import ConnectWallet from "./ConnectWallet";
 
 const Header = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -20,15 +20,7 @@ const Header = () => {
         <h1 className="text-xl font-bold">RMC Blockchain App</h1>
 
         {/* Connect/Disconnect Button */}
-        {isConnected ? (
-          <Button onClick={disconnectWallet} className="bg-red-500 px-4 py-2 rounded-md">
-            Disconnect
-          </Button>
-        ) : (
-          <Button onClick={connectWallet} className="bg-green-500 px-4 py-2 rounded-md">
-            Connect Wallet
-          </Button>
-        )}
+        <ConnectWallet />
       </div>
     </header>
   );
