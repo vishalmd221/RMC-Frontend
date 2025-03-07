@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import './App.css';
 import Header from './Components/Header';
+import Login from './Components/Login';
 function App() {
   return (
     <>
@@ -11,7 +12,7 @@ function App() {
         {/* Dropdown Menu */}
         <div className="relative">
           <div className="p-6 text-center">
-            <h2 className="text-2xl font-semibold">Welcome to the RMC Blockchain App</h2>
+            <Login />
           </div>
         </div>
       </div>
