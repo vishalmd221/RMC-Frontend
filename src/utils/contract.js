@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ethers } from 'ethers';
 import CONTRACT_ABI from './rmcABI (1).json';
 

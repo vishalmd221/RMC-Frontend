@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { ethers } from "ethers";
-import { Button, Dropdown, Menu, message } from "antd";
+import React from "react";
+import { Button, Dropdown, Menu } from "antd";
 import { DownOutlined } from "@ant-design/icons";
 import { useWallet } from "./WalletContext";
 

@@ -1,8 +1,7 @@
-'use client';
+import React from 'react';
 import { useState } from 'react';
 import { Form, Input, Upload, Button, DatePicker, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
 
 export default function CertificateIssuer() {

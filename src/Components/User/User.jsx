@@ -1,5 +1,5 @@
 'use client';
-
+import React from 'react';
 import { useState } from 'react';
 import { Card, Button, Input, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
@@ -81,7 +81,7 @@ export default function UserVerification() {
           >
             Approve All
           </Button>
-          <Button type="danger" className="w-full" onClick={() => handleFinalDecision('declined')}>
+          <Button type="default" className="w-full" onClick={() => handleFinalDecision('declined')}>
             Decline All
           </Button>
         </div>
