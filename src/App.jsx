@@ -7,6 +7,7 @@ import BuilderModule from './Components/Builder/Builder';
 import RMCModule from './Components/RMC/Rmc';
 import UserModule from './Components/User/User';
 import { useAuth } from './Components/context/AuthContext';
+import ApplicationsList from './Components/RMC/ApplicationsList';
 
 function App() {
   const { isLoggedIn, userInfo } = useAuth();
@@ -30,6 +31,7 @@ function App() {
             <BuilderModule />
             <UserModule />
             <RMCModule />
+            <ApplicationsList />
           </div>
         </div>
       )}
