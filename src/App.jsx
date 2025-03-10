@@ -1,5 +1,4 @@
-import { useState } from 'react';
-
+import React from 'react';
 import './App.css';
 import Header from './Components/Header';
 import Login from './Components/Login';
@@ -11,6 +10,7 @@ import ContractIntegration from './Components/contractIntegration';
 
 function App() {
   const { isLoggedIn, userInfo } = useAuth();
+
   if (!isLoggedIn) {
     return (
       <div>
