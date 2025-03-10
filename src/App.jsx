@@ -13,7 +13,7 @@ function App() {
 
   if (!isLoggedIn) {
     return (
-      <div className="p-6 text-center">
+      <div>
         <Login />
       </div>
     );
