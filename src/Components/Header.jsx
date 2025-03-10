@@ -1,17 +1,10 @@
 import { useState } from 'react';
 import ConnectWallet from './ConnectWallet';
+import { useAuth } from './context/AuthContext';
 
 const Header = () => {
   const [isConnected, setIsConnected] = useState(false);
-
-  const connectWallet = () => {
-    // Simulate connecting a wallet
-    setIsConnected(true);
-  };
-
-  const disconnectWallet = () => {
-    setIsConnected(false);
-  };
+  const { logout } = useAuth();
 
   return (
     <header className="bg-blue-600 text-white p-4 shadow-md">
@@ -20,7 +13,12 @@ const Header = () => {
         <h1 className=" text-white-100">RMC Blockchain App</h1>
 
         {/* Connect/Disconnect Button */}
-        <ConnectWallet />
+        <div className="flex items-center justify-between gap-x-4">
+          <button className="h-[42px] p-2" onClick={logout}>
+            LogOut
+          </button>
+          <ConnectWallet />
+        </div>
       </div>
     </header>
   );

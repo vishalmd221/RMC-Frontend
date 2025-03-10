@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useAuth } from './context/AuthContext';
 // import { useNavigate } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";
 
@@ -6,6 +7,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('User');
+  const { login } = useAuth();
   //   const navigate = useNavigate();
 
   // Static user data based on user type
@@ -27,13 +29,14 @@ const Login = () => {
     ],
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const validUser = users[userType].find(
       (user) => user.username === username && user.password === password,
     );
     if (validUser) {
       // Redirect to dashboard based on user type
       //   navigate("/dashboard");
+      await login(username, userType);
       alert(`Welcome ${userType}!`);
     } else {
       alert('Invalid credentials!');
