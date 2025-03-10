@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import React from 'react';
 import ConnectWallet from './ConnectWallet';
 import { useAuth } from './context/AuthContext';
 
 const Header = () => {
-  const [isConnected, setIsConnected] = useState(false);
   const { logout } = useAuth();
 
   return (

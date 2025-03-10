@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
 
@@ -12,13 +13,14 @@ export const WalletProvider = ({ children }) => {
 
   // Function to request account access and connect MetaMask
   const connectMetaMask = async () => {
-    if (window.ethereum) {
+    if (!window.ethereum) return 
       try {
         // Request account access
         const accounts = await window.ethereum.request({
           method: 'eth_requestAccounts',
         });
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        console.log(accounts)
+
         // Get the signer (the connected wallet)
         const signer = await provider.getSigner();
 
@@ -32,10 +34,7 @@ export const WalletProvider = ({ children }) => {
         setError(err.message);
         console.error('Error connecting to MetaMask:', err);
       }
-    } else {
-      setError('Please install MetaMask.');
-      console.log('MetaMask is not installed');
-    }
+
   };
 
   // Function to disconnect (reset state)
@@ -48,56 +47,56 @@ export const WalletProvider = ({ children }) => {
 
   // Listen for account changes and prompt the user to reconnect if the account is not connected
   useEffect(() => {
-    if (window.ethereum) {
-      // Check if the user has already connected an account
-      window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-        }
-      });
+    if (!window.ethereum) return;
+    // Check if the user has already connected an account
+    window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
+      if (accounts.length > 0) {
+        setAccount(accounts[0]);
+      }
+    });
 
-      // Handle account change
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        if (accounts.length === 0) {
-          // If no accounts are connected, prompt to connect
-          setAccount(null);
-          setProvider(null);
-          setError('Account disconnected. Please connect your wallet.');
-          console.log('Account disconnected');
+    // Handle account change
+    window.ethereum.on('accountsChanged', async (accounts) => {
+      if (accounts.length === 0) {
+        // If no accounts are connected, prompt to connect
+        setAccount(null);
+        setProvider(null);
+        setError('Account disconnected. Please connect your wallet.');
+        console.log('Account disconnected');
 
-          // Request connection again if no account is selected
-          await connectMetaMask();
-        } else {
-          // If the account changed, update the state with the new account
-          setAccount(accounts[0]);
-          setError(null);
-          console.log('Account changed to', accounts[0]);
-        }
-      });
+        // Request connection again if no account is selected
+        await connectMetaMask();
+      } else {
+        // If the account changed, update the state with the new account
+        setAccount(accounts[0]);
+        setError(null);
+        console.log('Account changed to', accounts[0]);
+      }
+    });
 
-      // Handle network change (optional)
-      window.ethereum.on('chainChanged', () => {
-        window.location.reload();
-      });
-    }
+    // Handle network change (optional)
+    window.ethereum.on('chainChanged', () => {
+      window.location.reload();
+    });
+
+    window.ethereum.on('accountsChanged', async (accounts) => {
+      if (accounts.length === 0) {
+        // If no accounts are connected, prompt to connect
+        setAccount(null);
+        setProvider(null);
+        setError('Account disconnected. Please connect your wallet.');
+        console.log('Account disconnected');
+
+        // Request connection again if no account is selected
+        await connectMetaMask();
+      } else {
+        // If the account changed, update the state with the new account
+        setAccount(accounts[0]);
+        setError(null);
+        console.log('Account changed to', accounts[0]);
+      }
+    });
   }, []);
-  window.ethereum.on('accountsChanged', async (accounts) => {
-    if (accounts.length === 0) {
-      // If no accounts are connected, prompt to connect
-      setAccount(null);
-      setProvider(null);
-      setError('Account disconnected. Please connect your wallet.');
-      console.log('Account disconnected');
-
-      // Request connection again if no account is selected
-      await connectMetaMask();
-    } else {
-      // If the account changed, update the state with the new account
-      setAccount(accounts[0]);
-      setError(null);
-      console.log('Account changed to', accounts[0]);
-    }
-  });
   return (
     <WalletContext.Provider
       value={{
