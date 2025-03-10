@@ -11,11 +11,13 @@ export default function UserVerification() {
 
   const houseDetails = {
     ownerName: 'John Doe',
-    ownerAddress: '0x00',
+    Gender: 'Male/Female',
+    MobileNumber: '9876543210',
+    panNumber: 'QWERT5678Y',
     landArea: '500 sq ft',
     landAddress: '123 Blockchain St, Crypto City',
-    panNumber: 'QWERT5678Y',
-    metadataHash: 'QmXyz123456...',
+    LandImage: 'QmXyz123456...',
+    ownerWalletAddress: '0x00',
   };
 
   const handleVerify = (field, status) => {
@@ -34,8 +36,23 @@ export default function UserVerification() {
 
         {Object.entries(houseDetails).map(([key, value]) => (
           <div key={key} className="mb-4 p-3 bg-[#f8f8f8] rounded-lg">
-            <p className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</p>
-            <TextArea value={value} disabled className="mt-2" rows={2} />
+            {key === 'LandImage' ? (
+              <>
+                <div>
+                  <p className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</p>
+                  <img
+                    src="https://media.istockphoto.com/id/474917902/photo/modern-architecture-design-100-for-house-bungalow.jpg?s=612x612&w=0&k=20&c=w5sBVyE-1ZmGmLdtK0F808826hMOyeVOiGYN2H17bOg="
+                    alt="Property Document"
+                    className="w-full rounded-lg shadow-md"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="font-semibold capitalize">{key.replace(/([A-Z])/g, ' $1')}:</p>
+                <TextArea value={value} disabled className="mt-2" rows={2} />
+              </>
+            )}
             <div className="flex gap-4 mt-2">
               <Button
                 type={verification[key] === 'accepted' ? 'primary' : 'default'}
@@ -45,7 +62,7 @@ export default function UserVerification() {
                 Accept
               </Button>
               <Button
-                type={verification[key] === 'declined' ? 'danger' : 'default'}
+                danger={verification[key] === 'declined'}
                 icon={<CloseCircleOutlined />}
                 onClick={() => handleVerify(key, 'declined')}
               >
