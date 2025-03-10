@@ -12,7 +12,7 @@ const ContractIntegration = () => {
     }
   };
 
-  getPropertyDetails(1);
+  // getPropertyDetails(1); //THIS FUNCTION CALL IS FOR TESTING PURPOSE ONLY.
 };
 
 export default ContractIntegration;

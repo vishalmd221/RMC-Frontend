@@ -2,9 +2,9 @@ import { ethers } from 'ethers';
 import CONTRACT_ABI from './rmcABI (1).json';
 
 // Load Infura RPC from environment variables
+const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49'; // Your contract address
 const INFURA_RPC_URL = import.meta.env.VITE_INFURA_RPC_URL;
 
-const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49'; // Your contract address
 
 // ✅ Correcting the provider instantiation
 const provider = new ethers.providers.JsonRpcProvider(INFURA_RPC_URL);
