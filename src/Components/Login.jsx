@@ -18,14 +18,14 @@ const Login = () => {
       { username: 'user3', password: 'pass3' },
     ],
     RMC: [
-      { username: 'rmc1', password: 'rmcpass1' },
-      { username: 'rmc2', password: 'rmcpass2' },
-      { username: 'rmc3', password: 'rmcpass3' },
+      { username: 'rmc1', password: 'pass1' },
+      { username: 'rmc2', password: 'pass2' },
+      { username: 'rmc3', password: 'pass3' },
     ],
     Builder: [
-      { username: 'builder1', password: 'builderpass1' },
-      { username: 'builder2', password: 'builderpass2' },
-      { username: 'builder3', password: 'builderpass3' },
+      { username: 'builder1', password: 'pass1' },
+      { username: 'builder2', password: 'pass2' },
+      { username: 'builder3', password: 'pass3' },
     ],
   };
 
@@ -44,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center bg-gray-100">
+    <div className="h-screen flex justify-center items-center bg-gray-100 p-6 text-center">
       <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
 

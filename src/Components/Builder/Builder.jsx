@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Form, Input, Upload, Button, DatePicker, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import TextArea from 'antd/es/input/TextArea';
 
 export default function CertificateIssuer() {
   const [form] = Form.useForm();
@@ -43,7 +44,13 @@ export default function CertificateIssuer() {
           >
             <Input placeholder="Enter owner name" />
           </Form.Item>
-
+          <Form.Item
+            label="Mobile Number"
+            name="Enter Mobile Number"
+            rules={[{ required: true, message: 'Enter Mobile Number' }]}
+          >
+            <Input placeholder="Enter Mobile Number" />
+          </Form.Item>
           <Form.Item
             label="Owner Address"
             name="title"
@@ -51,7 +58,6 @@ export default function CertificateIssuer() {
           >
             <Input placeholder="Enter Owner Address" />
           </Form.Item>
-
           {/* <Form.Item
             label="Date of Issuance"
             name="date"
@@ -59,7 +65,6 @@ export default function CertificateIssuer() {
           >
             <DatePicker className="w-full" />
           </Form.Item> */}
-
           <Form.Item
             label="Gender"
             name="Enter Gender"
@@ -67,13 +72,25 @@ export default function CertificateIssuer() {
           >
             <Input placeholder="Enter Gender" />
           </Form.Item>
-
           <Form.Item
             label="Land Area"
             name="Enter Land Area"
             rules={[{ required: true, message: 'Enter Land Area' }]}
           >
             <Input placeholder="Enter Gender" />
+          </Form.Item>
+          <Form.Item
+            label="Land Address"
+            name="landAddress"
+            rules={[{ required: true, message: 'Enter details about the property address.' }]}
+          >
+            <TextArea
+              placeholder="Enter details about Property address."
+              className="min-h-[100px]"
+              rows={4}
+              // value={formData.landAddress} // Uncomment if using state
+              // onChange={handleInputChange}  // Uncomment if using state
+            />
           </Form.Item>
 
           <Form.Item
@@ -98,15 +115,13 @@ export default function CertificateIssuer() {
           >
             <Input placeholder="Enter Metadata Hash" />
           </Form.Item>
-
           <Form.Item label="Upload Certificate">
             <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
               <Button icon={<UploadOutlined />}>Click to Upload</Button>
             </Upload>
           </Form.Item>
-
           <Button type="primary" htmlType="submit" className="w-full mt-4">
-            Issue Certificate
+            Mint Certificate
           </Button>
         </Form>
 

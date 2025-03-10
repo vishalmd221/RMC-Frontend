@@ -4,7 +4,7 @@ import './App.css';
 import Header from './Components/Header';
 import Login from './Components/Login';
 import BuilderModule from './Components/Builder/Builder';
-import RMCModule from './Components/Rmc/Rmc';
+import RMCModule from './Components/RMC/Rmc';
 import UserModule from './Components/User/User';
 import { useAuth } from './Components/context/AuthContext';
 import ApplicationsList from './Components/RMC/ApplicationsList';
@@ -14,7 +14,7 @@ function App() {
 
   if (!isLoggedIn) {
     return (
-      <div className="p-6 text-center">
+      <div>
         <Login />
       </div>
     );
