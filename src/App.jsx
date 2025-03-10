@@ -4,7 +4,7 @@ import './App.css';
 import Header from './Components/Header';
 import Login from './Components/Login';
 import BuilderModule from './Components/Builder/Builder';
-import RMCModule from './Components/Rmc/Rmc';
+import RMCModule from './Components/RMC/Rmc';
 import UserModule from './Components/User/User';
 
 function App() {
