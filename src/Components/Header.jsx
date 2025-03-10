@@ -10,7 +10,7 @@ const Header = () => {
     <header className="bg-blue-600 text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <h1 className=" text-white-100">RMC Blockchain App</h1>
+        <div className="text-white text-[25px]">RMC Blockchain App</div>
 
         {/* Connect/Disconnect Button */}
         <div className="flex items-center justify-between gap-x-4">

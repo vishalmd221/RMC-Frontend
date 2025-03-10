@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { useAuth } from './context/AuthContext';
-// import { useNavigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('User');
   const { login } = useAuth();
-  //   const navigate = useNavigate();
 
   // Static user data based on user type
   const users = {
