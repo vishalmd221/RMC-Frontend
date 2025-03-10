@@ -17,7 +17,7 @@ const getContract = async () => {
     if (!window.ethereum) throw new Error('No crypto wallet found.');
 
     await window.ethereum.request({ method: 'eth_requestAccounts' });
-    
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const network = await provider.getNetwork();
@@ -38,17 +38,65 @@ export default function CertificateIssuer() {
   const [transactionHash, setTransactionHash] = useState('');
 
   // Handle file upload
-  const handleUpload = (info) => {
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} uploaded successfully`);
-      setFileList([info.file]);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} upload failed.`);
-    }
+  const handleUpload = (e) => {
+    console.log({e})
+    setFileList(e.target.files[0]);
+    // if (info.file.status === 'done') {
+    //   message.success(`${info.file.name} uploaded successfully`);
+    //   setFileList([info.file]);
+    // } else if (info.file.status === 'error') {
+    //   message.error(`${info.file.name} upload failed.`);
+    // }
   };
 
   const onFinish = async (values) => {
     try {
+      const formData = new FormData();
+      console.log(fileList, ' fileList');
+      formData.append('file', fileList);
+      const response = await fetch('http://localhost:5000/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) return;
+      const data = await response.json();
+      // setIpfsData(data);
+      // setUploadStatus(`File uploaded successfully!`);
+
+      const metadata = {
+        description: 'WELCOME TO MY HOUSE',
+        external_url: 'https://openseacreatures.io/3',
+        image: `https://brown-leading-scallop-142.mypinata.cloud/ipfs/${data.IpfsHash}`,
+        name: values.ownerName,
+        attributes: [
+          {
+            trait_type: 'IMAGE',
+            value: '100',
+          },
+        ],
+      };
+
+      const jsonResponse = await fetch('http://localhost:5000/uploadJson', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(metadata),
+      });
+
+      const jsonData = await jsonResponse.json();
+      console.log('JSON Metadata uploaded:', jsonData);
+      console.log('IpfsHash', jsonData.IpfsHash);
+
+      const metadatanft = `https://ipfs.io/ipfs/${jsonData.IpfsHash}`; // link of pinata where we are storing hash
+      console.log(metadatanft, 'metadatanft');
+      console.log({ metadatanft });
+
       const contract = await getContract();
       if (!contract) return;
       console.log('Form Data:', values);
@@ -67,7 +115,7 @@ export default function CertificateIssuer() {
       };
 
       // Call smart contract function
-      const tx = await contract.createDocByBuilder(propertyDetails, values.ipfsHash);
+      const tx = await contract.createDocByBuilder(propertyDetails, metadatanft);
       await tx.wait();
 
       setTransactionHash(tx.hash);
@@ -139,17 +187,19 @@ export default function CertificateIssuer() {
             >
               <Input placeholder="Enter PAN Number" />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label="IPFS Metadata Hash"
               name="ipfsHash"
               rules={[{ required: true, message: 'Enter IPFS Metadata Hash' }]}
             >
               <Input placeholder="Enter Metadata Hash" />
-            </Form.Item>
+            </Form.Item> */}
+
             <Form.Item label="Upload Certificate">
-              <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
+              {/* <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
                 <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
+              </Upload> */}
+              <input type="file" onChange={handleUpload} />
             </Form.Item>
             <Button type="primary" htmlType="submit" className="w-full mt-4">
               Mint Certificate
