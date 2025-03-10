@@ -1,38 +1,67 @@
-import React, { useState } from 'react';
+import { ethers } from 'ethers';
+import React, { useEffect, useState } from 'react';
+import contractABI from '../../utils/rmcABI (1).json'; // Adjust the path to your ABI file
 
 const Rmc = () => {
-  // Dummy application data for the RMC to review
-  const applications = [
-    {
-      id: 1,
-      ownerName: 'John Doe',
-      userAddress: '123 Main St',
-      ipfsHash: 'QmT1m3FVYbFsd77d8Wz5p8DSu8tjhsJrXr7RVA9rp6sfuN',
-      gender: 'Male',
-      landArea: '1200 sq ft',
-      pancard: 'ABCD1234E',
-      houseAddress: '456 Elm St',
-      mobileNumber: '9876543210',
-      imageUrl:
-        'https://media.istockphoto.com/id/474917902/photo/modern-architecture-design-100-for-house-bungalow.jpg?s=612x612&w=0&k=20&c=w5sBVyE-1ZmGmLdtK0F808826hMOyeVOiGYN2H17bOg=',
-      status: 'Pending', // Initially status is 'Pending'
-    },
-    {
-      id: 2,
-      ownerName: 'Jane Smith',
-      userAddress: '456 Oak Rd',
-      ipfsHash: 'QmV3F6Tx5VVkt6bYkK4erA5a5TTqsaTHg2hn3XwvDjmzaG',
-      gender: 'Female',
-      landArea: '1500 sq ft',
-      pancard: 'EFGH5678F',
-      houseAddress: '789 Pine Ave',
-      mobileNumber: '9988776655',
-      imageUrl:
-        'https://media.istockphoto.com/id/474917902/photo/modern-architecture-design-100-for-house-bungalow.jpg?s=612x612&w=0&k=20&c=w5sBVyE-1ZmGmLdtK0F808826hMOyeVOiGYN2H17bOg=',
-      status: 'Pending', // Initially status is 'Pending'
-    },
-    // More applications can be added
-  ];
+  const [signedTokens, setSignedTokens] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Dummy application data for the RMC to review
+    const contractAddress = '0x6011B598CAb43005e3684469C64436DA0d417111'; // Replace with your contract address
+
+    // Initialize the provider with the `resolveNames` option set to false
+    const provider = new ethers.providers.JsonRpcProvider(
+      'https://polygon-amoy.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
+      {
+        chainId: 80002, // Polygon Mumbai Testnet Chain ID
+        name: 'matic-amoy', // Polygon Mumbai network name
+        resolveNames: false, // Disable ENS resolution
+      },
+    );
+
+    const contract = new ethers.Contract(contractAddress, contractABI, provider);
+    const getSignedTokenDetails = async () => {
+      try {
+        // Step 1: Fetch all token IDs
+        const allTokenIds = await contract.getAllTokenIds();
+        console.log({ allTokenIds });
+        const signedTokens = [];
+        for (let i = 0; i < allTokenIds.length; i++) {
+          const tokenId = allTokenIds[i];
+          const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
+          const tokenDetailsPlainObject = Object.fromEntries(Object.entries(tokenDetails));
+          // Step 3: Check if `isSignedByOwner` is true
+          if (tokenDetailsPlainObject[8]) {
+            const image = await contract.tokenURI(tokenId.toString());
+            const getimage = await fetchImage(image);
+            signedTokens.push({
+              id: tokenId,
+              ownerName: tokenDetails[0],
+              userAddress: tokenDetails[1],
+              houseAddress: tokenDetails[2],
+              // number: tokenDetails[3],
+              gender: tokenDetails[4],
+              landArea: tokenDetails[5],
+              pancard: tokenDetails[6],
+              mobileNumber: '9876543210',
+              imageUrl: getimage,
+              status: 'Pending', // Initially status is 'Pending'
+            });
+          }
+        }
+
+        // Step 4: Set the filtered signed tokens in the state
+        setSignedTokens(signedTokens);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching signed token details:', error);
+        setLoading(false);
+      }
+    };
+
+    getSignedTokenDetails();
+  }, []);
 
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
@@ -56,9 +85,9 @@ const Rmc = () => {
   const handleBackToList = () => {
     setSelectedApplication(null);
   };
-
   // Handle application approval
   const handleApprove = () => {
+    const response = contract.verifyDoc();
     if (selectedApplication) {
       setSelectedApplication({
         ...selectedApplication,
@@ -79,23 +108,46 @@ const Rmc = () => {
     }
   };
 
+  const fetchImage = async (tokenURI) => {
+    try {
+      const response = await fetch(tokenURI);
+      const metadata = await response.json();
+      return metadata.image;
+    } catch (error) {
+      console.log({ error });
+      return error;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader"></div>
+        <p className="text-gray-500">Loading applications...</p>
+      </div>
+    );
+  }
   return (
     <div className="h-screen p-8 bg-gray-100">
       {/* If no application is selected, show the list of applications */}
       {!selectedApplication ? (
         <div className="space-y-4">
-          {applications.map((application) => (
-            <div
-              key={application.id}
-              className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
-              onClick={() => handleApplicationClick(application)}
-            >
-              <h3 className="text-xl font-semibold">{application.ownerName}</h3>
-              <p className="text-gray-600">{application.userAddress}</p>
-              <p className="text-sm text-gray-500">Land Area: {application.landArea}</p>
-              <p className="text-sm text-gray-500">Status: {application.status}</p>
-            </div>
-          ))}
+          {signedTokens.map((application) => {
+            return (
+              <div
+                key={application.id.toString()}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
+                onClick={() => handleApplicationClick(application)}
+              >
+                <h3 className="text-xl font-semibold">{application.ownerName}</h3>
+                <p className="text-gray-600">{application.userAddress}</p>
+                <p className="text-sm text-gray-500">
+                  Land Area: {application.landArea.toString()}
+                </p>
+                <p className="text-sm text-gray-500">Status: {application.status}</p>
+              </div>
+            );
+          })}
         </div>
       ) : (
         // If an application is selected, show the details
@@ -125,17 +177,6 @@ const Rmc = () => {
             </p>
             <p>
               <strong>Mobile Number:</strong> {selectedApplication.mobileNumber}
-            </p>
-            <p>
-              <strong>IPFS Hash:</strong>{' '}
-              <a
-                href={`https://ipfs.io/ipfs/${selectedApplication.ipfsHash}`}
-                className="text-blue-500"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {selectedApplication.ipfsHash}
-              </a>
             </p>
 
             {/* Image with click to enlarge */}

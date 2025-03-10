@@ -12,7 +12,7 @@ import CONTRACT_ABI from '../../utils/rmcABI (1).json';
 const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
 
 // Function to get the contract instance
-const getContract = async () => {
+export const getContract = async () => {
   try {
     if (!window.ethereum) throw new Error('No crypto wallet found.');
 
