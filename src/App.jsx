@@ -7,7 +7,7 @@ import BuilderModule from './Components/Builder/Builder';
 import UserModule from './Components/User/User';
 import { useAuth } from './Components/context/AuthContext';
 import Rmc from './Components/RMC/Rmc';
-
+import ContractIntegration from './Components/contractIntegration';
 
 function App() {
   const { isLoggedIn, userInfo } = useAuth();
@@ -23,6 +23,8 @@ function App() {
       {isLoggedIn && (
         <div className="min-h-screen bg-gray-100">
           <Header />
+          <ContractIntegration />
+
           <div className="container mx-auto py-8 px-4">
             {userInfo?.userType === 'Builder' && <BuilderModule />}
             {userInfo?.userType === 'User' && <UserModule />}
