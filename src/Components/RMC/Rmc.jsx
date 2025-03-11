@@ -5,6 +5,7 @@ import contractABI from '../../utils/rmcABI (1).json'; // Ensure the correct pat
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [approving, setApproving] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const contractAddress = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
@@ -61,6 +62,7 @@ const Rmc = () => {
   };
 
   const handleApprove = async (tokenId) => {
+    setApproving(true);
     try {
       // @ts-ignore
       const newProvider = new ethers.providers.Web3Provider(window.ethereum);
@@ -70,9 +72,11 @@ const Rmc = () => {
       await tx.wait();
       alert(`Application for ${selectedApplication.ownerName} has been approved.`);
       setSelectedApplication((prev) => ({ ...prev, status: 'Approved' }));
+      setApproving(false);
     } catch (error) {
       console.error('Transaction failed:', error);
       alert(error.data.message);
+      setApproving(false);
     }
   };
 
@@ -96,7 +100,9 @@ const Rmc = () => {
               <h3 className="text-xl font-semibold">{app.ownerName}</h3>
               <p className="text-gray-600">{app.userAddress}</p>
               <p className="text-sm text-gray-500">Land Area: {app.landArea.toString()}</p>
-              <p className="text-sm text-gray-500">Status: {app.status}</p>
+              <p className="text-sm text-gray-500">
+                Status: {app.isVerifiedByRMC ? 'Verified' : 'Pending'}
+              </p>
             </div>
           ))}
         </div>
@@ -142,10 +148,14 @@ const Rmc = () => {
             <div className="mt-6 flex justify-center">
               <button
                 onClick={() => handleApprove(selectedApplication.id)}
-                className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                disabled={!selectedApplication.isVerifiedByRMC}
+                className={`px-6 py-2 rounded-md ${selectedApplication.isVerifiedByRMC || approving ? '!bg-gray-500 !cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 '} text-white`}
+                disabled={selectedApplication.isVerifiedByRMC && approving}
               >
-                {selectedApplication.isVerifiedByRMC ? 'Already Verified' : 'Approve'}
+                {selectedApplication.isVerifiedByRMC
+                  ? 'Already Verified'
+                  : approving
+                    ? 'Approving...'
+                    : 'Approve'}
               </button>
             </div>
           </div>
