@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
-import contractABI from '../../utils/latestRmcAbi'; // Ensure the correct path
+import contractABI from '../../utils/latestRmcAbi.json'; // Ensure the correct path
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -26,7 +26,7 @@ const Rmc = () => {
             const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
 
             // Only fetch and return details if the document is NOT verified by RMC
-            if (tokenObject[7] === true && tokenObject[8] === false) {
+            if (tokenObject[7] === true) {
               const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
               return {
                 id: tokenId,
@@ -93,20 +93,24 @@ const Rmc = () => {
     <div className="h-screen p-8 bg-gray-100">
       {!selectedApplication ? (
         <div className="space-y-4">
-          {signedTokens.map((app) => (
-            <div
-              key={app.id.toString()}
-              className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
-              onClick={() => setSelectedApplication(app)}
-            >
-              <h3 className="text-xl font-semibold">{app.ownerName}</h3>
-              <p className="text-gray-600">{app.userAddress}</p>
-              <p className="text-sm text-gray-500">Land Area: {app.landArea.toString()}</p>
-              <p className="text-sm text-gray-500">
-                Status: {app.isVerifiedByRMC ? 'Verified' : 'Pending'}
-              </p>
-            </div>
-          ))}
+          {signedTokens.length === 0 ? (
+            <p className="text-center text-lg text-gray-500">No applications</p>
+          ) : (
+            signedTokens.map((app) => (
+              <div
+                key={app.id.toString()}
+                className={`bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer ${app.isVerifiedByRMC ? 'bg-green-500' : 'bg-white'}`}
+                onClick={() => setSelectedApplication(app)}
+              >
+                <h3 className="text-xl font-semibold">{app.ownerName}</h3>
+                <p className="text-gray-600">{app.userAddress}</p>
+                <p className="text-sm text-gray-500">Land Area: {app.landArea.toString()}</p>
+                <p className="text-sm text-gray-500">
+                  Status: {app.isVerifiedByRMC ? 'Verified' : 'Pending'}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       ) : (
         <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
