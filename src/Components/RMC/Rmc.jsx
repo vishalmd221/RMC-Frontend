@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
-import contractABI from '../../utils/rmcABI (1).json'; // Ensure the correct path
+import contractABI from '../../utils/latestRmcAbi'; // Ensure the correct path
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -8,9 +8,12 @@ const Rmc = () => {
   const [approving, setApproving] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const contractAddress = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
+  const contractAddress = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
 
-  const provider = new ethers.providers.JsonRpcProvider('https://alfajores-forno.celo-testnet.org');
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://alfajores-forno.celo-testnet.org',
+    // 'https://celo-alfajores.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
+  );
   const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
   useEffect(() => {
@@ -23,7 +26,7 @@ const Rmc = () => {
             const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
 
             // Only fetch and return details if the document is NOT verified by RMC
-            if (tokenObject[7] === true) {
+            if (tokenObject[7] === true && tokenObject[8] === false) {
               const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
               return {
                 id: tokenId,
@@ -64,11 +67,10 @@ const Rmc = () => {
   const handleApprove = async (tokenId) => {
     setApproving(true);
     try {
-      // @ts-ignore
       const newProvider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await newProvider.getSigner();
-      const contractWithSigner = new ethers.Contract(contractAddress, contractABI, signer);
-      const tx = await contractWithSigner.verifyDoc(tokenId);
+      const contractWithSigner = new ethers.Contract(contractAddress, contractABI).connect(signer);
+      const tx = await contractWithSigner.rmcApproved(tokenId);
       await tx.wait();
       alert(`Application for ${selectedApplication.ownerName} has been approved.`);
       setSelectedApplication((prev) => ({ ...prev, status: 'Approved' }));
@@ -132,7 +134,7 @@ const Rmc = () => {
               <strong>PAN Card:</strong> {selectedApplication.pancard}
             </p>
             <p>
-              <strong>House Address:</strong> {selectedApplication.houseAddress}
+              <strong>House Address:</strong> {selectedApplication.userAddress}
             </p>
             <p>
               <strong>Mobile Number:</strong> {selectedApplication.mobileNumber}
@@ -158,6 +160,7 @@ const Rmc = () => {
                     : 'Approve'}
               </button>
             </div>
+            <p className="mt-2 text-sm text-gray-500">Status: {selectedApplication.status}</p>
           </div>
         </div>
       )}
