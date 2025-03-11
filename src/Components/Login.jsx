@@ -33,7 +33,7 @@ const Login = () => {
     if (validUser) {
       // Redirect to dashboard based on user type
       //   navigate("/dashboard");
-      await login(username, userType);
+      login(username, userType);
       alert(`Welcome ${userType}!`);
     } else {
       alert('Invalid credentials!');

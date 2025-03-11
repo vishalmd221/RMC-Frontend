@@ -1,9 +1,36 @@
-'use client';
+// @ts-nocheck
+import React from 'react';
 import { useState } from 'react';
 import { Form, Input, Upload, Button, DatePicker, message, Card } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import TextArea from 'antd/es/input/TextArea';
+import { ethers } from 'ethers';
+// @ts-ignore
+import CONTRACT_ABI from '../../utils/rmcABI (1).json';
+
+// Contract address
+const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
+
+// Function to get the contract instance
+export const getContract = async () => {
+  try {
+    if (!window.ethereum) throw new Error('No crypto wallet found.');
+
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    const network = await provider.getNetwork();
+    console.log('Connected Network:', network);
+
+    const signer = provider.getSigner();
+
+    return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI).connect(signer);
+  } catch (error) {
+    console.error('Contract Connection Error:', error);
+    message.error('Failed to connect to contract. Ensure you are on Polygon Amoy Testnet.');
+  }
+};
 
 export default function CertificateIssuer() {
   const [form] = Form.useForm();
@@ -11,24 +38,92 @@ export default function CertificateIssuer() {
   const [transactionHash, setTransactionHash] = useState('');
 
   // Handle file upload
-  const handleUpload = (info) => {
-    if (info.file.status === 'done') {
-      message.success(`${info.file.name} uploaded successfully`);
-      setFileList([info.file]);
-    } else if (info.file.status === 'error') {
-      message.error(`${info.file.name} upload failed.`);
-    }
+  const handleUpload = (e) => {
+    console.log({e})
+    setFileList(e.target.files[0]);
+    // if (info.file.status === 'done') {
+    //   message.success(`${info.file.name} uploaded successfully`);
+    //   setFileList([info.file]);
+    // } else if (info.file.status === 'error') {
+    //   message.error(`${info.file.name} upload failed.`);
+    // }
   };
 
-  // Handle form submission
   const onFinish = async (values) => {
-    console.log('Form Data:', values);
+    try {
+      const formData = new FormData();
+      console.log(fileList, ' fileList');
+      formData.append('file', fileList);
+      const response = await fetch('http://localhost:5000/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          Accept: 'application/json',
+        },
+      });
 
-    // Mock Blockchain transaction hash
-    const mockTxHash = '0x' + Math.random().toString(36).substring(2, 42);
-    setTransactionHash(mockTxHash);
+      if (!response.ok) return;
+      const data = await response.json();
+      // setIpfsData(data);
+      // setUploadStatus(`File uploaded successfully!`);
 
-    message.success('Certificate Issued Successfully on Blockchain!');
+      const metadata = {
+        description: 'WELCOME TO MY HOUSE',
+        external_url: 'https://openseacreatures.io/3',
+        image: `https://brown-leading-scallop-142.mypinata.cloud/ipfs/${data.IpfsHash}`,
+        name: values.ownerName,
+        attributes: [
+          {
+            trait_type: 'IMAGE',
+            value: '100',
+          },
+        ],
+      };
+
+      const jsonResponse = await fetch('http://localhost:5000/uploadJson', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(metadata),
+      });
+
+      const jsonData = await jsonResponse.json();
+      console.log('JSON Metadata uploaded:', jsonData);
+      console.log('IpfsHash', jsonData.IpfsHash);
+
+      const metadatanft = `https://ipfs.io/ipfs/${jsonData.IpfsHash}`; // link of pinata where we are storing hash
+      console.log(metadatanft, 'metadatanft');
+      console.log({ metadatanft });
+
+      const contract = await getContract();
+      if (!contract) return;
+      console.log('Form Data:', values);
+
+      // Convert form data into Solidity `propertyDetails` struct
+      const propertyDetails = {
+        Name: values.ownerName,
+        Address: values.landAddress,
+        ownerAddress: values.ownerAddress,
+        Number: parseInt(values.mobileNumber, 10),
+        Gender: values.gender,
+        SqFoot: parseInt(values.landArea, 10),
+        PanCardNumber: values.panNumber,
+        isSignedByOwner: false,
+        isVerifiedByRMC: false,
+      };
+
+      // Call smart contract function
+      const tx = await contract.createDocByBuilder(propertyDetails, metadatanft);
+      await tx.wait();
+
+      setTransactionHash(tx.hash);
+      message.success('Certificate Issued on Blockchain!');
+    } catch (error) {
+      console.error('Blockchain Transaction Error:', error);
+      message.error('Transaction failed! Make sure you are connected to the right network.');
+    }
   };
 
   return (
@@ -40,87 +135,71 @@ export default function CertificateIssuer() {
 
           <Form form={form} layout="vertical" onFinish={onFinish}>
             <Form.Item
-              label="Owner name"
-              name="recipient"
+              label="Owner Name"
+              name="ownerName"
               rules={[{ required: true, message: 'Enter owner name' }]}
             >
               <Input placeholder="Enter owner name" />
             </Form.Item>
             <Form.Item
               label="Mobile Number"
-              name="Enter Mobile Number"
+              name="mobileNumber"
               rules={[{ required: true, message: 'Enter Mobile Number' }]}
             >
               <Input placeholder="Enter Mobile Number" />
             </Form.Item>
             <Form.Item
               label="Owner Address"
-              name="title"
+              name="ownerAddress"
               rules={[{ required: true, message: 'Enter Owner Address' }]}
             >
               <Input placeholder="Enter Owner Address" />
             </Form.Item>
-            {/* <Form.Item
-            label="Date of Issuance"
-            name="date"
-            rules={[{ required: true, message: 'Select issuance date' }]}
-          >
-            <DatePicker className="w-full" />
-          </Form.Item> */}
             <Form.Item
               label="Gender"
-              name="Enter Gender"
+              name="gender"
               rules={[{ required: true, message: 'Enter Gender' }]}
             >
               <Input placeholder="Enter Gender" />
             </Form.Item>
             <Form.Item
-              label="Land Area"
-              name="Enter Land Area"
+              label="Land Area (Sq Foot)"
+              name="landArea"
               rules={[{ required: true, message: 'Enter Land Area' }]}
             >
-              <Input placeholder="Enter Gender" />
+              <Input placeholder="Enter Land Area" />
             </Form.Item>
             <Form.Item
               label="Land Address"
               name="landAddress"
-              rules={[{ required: true, message: 'Enter details about the property address.' }]}
+              rules={[{ required: true, message: 'Enter Property Address.' }]}
             >
               <TextArea
                 placeholder="Enter details about Property address."
                 className="min-h-[100px]"
                 rows={4}
-                // value={formData.landAddress} // Uncomment if using state
-                // onChange={handleInputChange}  // Uncomment if using state
               />
             </Form.Item>
-
             <Form.Item
               label="PAN Number"
-              name="Enter PAN Number"
+              name="panNumber"
               rules={[{ required: true, message: 'Enter PAN Number' }]}
             >
               <Input placeholder="Enter PAN Number" />
             </Form.Item>
-
-            <Form.Item label="Certificate ID" name="certificateId">
-              <Input
-                placeholder="Auto-generated ID"
-                disabled
-                value={'CERT-' + Math.floor(Math.random() * 10000)}
-              />
-            </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label="IPFS Metadata Hash"
-              name="IPFS Metadata Hash"
+              name="ipfsHash"
               rules={[{ required: true, message: 'Enter IPFS Metadata Hash' }]}
             >
               <Input placeholder="Enter Metadata Hash" />
-            </Form.Item>
+            </Form.Item> */}
+
             <Form.Item label="Upload Certificate">
-              <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
+              {/* <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
                 <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
+              </Upload> */}
+              <input type="file" onChange={handleUpload} />
             </Form.Item>
             <Button type="primary" htmlType="submit" className="w-full mt-4">
               Mint Certificate
