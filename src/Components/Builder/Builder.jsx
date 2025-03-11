@@ -54,7 +54,7 @@ export default function CertificateIssuer() {
       const formData = new FormData();
       console.log(fileList, ' fileList');
       formData.append('file', fileList);
-      const response = await fetch('http://localhost:5000/upload', {
+      const response = await fetch('https://rmc-backend-rabl.onrender.com/upload', {
         method: 'POST',
         body: formData,
         headers: {
@@ -80,7 +80,7 @@ export default function CertificateIssuer() {
         ],
       };
 
-      const jsonResponse = await fetch('http://localhost:5000/uploadJson', {
+      const jsonResponse = await fetch('https://rmc-backend-rabl.onrender.com/uploadJson', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
