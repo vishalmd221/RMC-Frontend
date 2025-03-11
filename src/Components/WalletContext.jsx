@@ -13,28 +13,27 @@ export const WalletProvider = ({ children }) => {
 
   // Function to request account access and connect MetaMask
   const connectMetaMask = async () => {
-    if (!window.ethereum) return 
-      try {
-        // Request account access
-        const accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        console.log(accounts)
+    if (!window.ethereum) return;
+    try {
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      });
+      console.log(accounts);
 
-        // Get the signer (the connected wallet)
-        const signer = await provider.getSigner();
+      // Get the signer (the connected wallet)
+      const signer = await provider.getSigner();
 
-        // Get the user's account address
-        const userAccount = await signer.getAddress();
-        setAccount(userAccount);
-        setProvider(provider);
+      // Get the user's account address
+      const userAccount = await signer.getAddress();
+      setAccount(userAccount);
+      setProvider(provider);
 
-        console.log('Connected to MetaMask with account:', userAccount);
-      } catch (err) {
-        setError(err.message);
-        console.error('Error connecting to MetaMask:', err);
-      }
-
+      console.log('Connected to MetaMask with account:', userAccount);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error connecting to MetaMask:', err);
+    }
   };
 
   // Function to disconnect (reset state)

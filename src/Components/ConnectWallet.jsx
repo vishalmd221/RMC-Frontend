@@ -1,7 +1,7 @@
-import React from "react";
-import { Button, Dropdown, Menu } from "antd";
-import { DownOutlined } from "@ant-design/icons";
-import { useWallet } from "./WalletContext";
+import React from 'react';
+import { Button, Dropdown, Menu } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { useWallet } from './WalletContext';
 
 const ConnectWallet = () => {
   const { account, connectMetaMask, disconnectMetaMask, error } = useWallet();
@@ -10,7 +10,7 @@ const ConnectWallet = () => {
   const copyToClipboard = () => {
     if (account) {
       navigator.clipboard.writeText(account);
-      alert("Address copied to clipboard");
+      alert('Address copied to clipboard');
     }
   };
 
@@ -19,7 +19,7 @@ const ConnectWallet = () => {
     if (address) {
       return `${address.slice(0, 5)}...${address.slice(-5)}`;
     }
-    return "";
+    return '';
   };
 
   const menu = (
@@ -37,14 +37,14 @@ const ConnectWallet = () => {
       {!account ? (
         <Button onClick={connectMetaMask}>Connect Wallet</Button>
       ) : (
-        <Dropdown overlay={menu} trigger={["click"]}>
+        <Dropdown overlay={menu} trigger={['click']}>
           <Button>
             {shortenAddress(account)} <DownOutlined />
           </Button>
         </Dropdown>
       )}
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {/* {error && <p style={{ color: 'red' }}>{error}</p>} */}
     </div>
   );
 };

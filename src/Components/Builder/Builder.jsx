@@ -36,6 +36,7 @@ export default function CertificateIssuer() {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [transactionHash, setTransactionHash] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Handle file upload
   const handleUpload = (e) => {
@@ -51,6 +52,8 @@ export default function CertificateIssuer() {
 
   const onFinish = async (values) => {
     try {
+      setLoading(true); // Disable the button when the transaction starts
+
       const formData = new FormData();
       console.log(fileList, ' fileList');
       formData.append('file', fileList);
@@ -117,12 +120,15 @@ export default function CertificateIssuer() {
       // Call smart contract function
       const tx = await contract.createByBuilder(propertyDetails, metadatanft);
       await tx.wait();
+      setLoading(false);
 
       setTransactionHash(tx.hash);
       message.success('Certificate Issued on Blockchain!');
     } catch (error) {
       console.error('Blockchain Transaction Error:', error);
       message.error('Transaction failed! Make sure you are connected to the right network.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -197,19 +203,34 @@ export default function CertificateIssuer() {
 
             <Form.Item label="Upload Certificate">
               {/* <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                <Button icon={<UpsloadOutlined />}>Click to Upload</Button>
               </Upload> */}
               <input type="file" onChange={handleUpload} />
             </Form.Item>
-            <Button type="primary" htmlType="submit" className="w-full mt-4">
-              Mint Certificate
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full mt-4"
+              disabled={loading}
+              loading={loading}
+            >
+              {loading ? 'Minting...' : 'Mint Certificate'}
             </Button>
           </Form>
 
           {transactionHash && (
             <div className="mt-6 p-4 bg-white-700 rounded-lg text-center">
               <p className="text-green-400">Certificate Issued on Blockchain!</p>
-              <p className="text-sm break-all">{transactionHash}</p>
+              <p className="text-sm break-all">
+                <a
+                  href={`https://alfajores.celoscan.io/tx/${transactionHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 underline"
+                >
+                  View Transaction on Explorer
+                </a>
+              </p>
             </div>
           )}
         </Card>

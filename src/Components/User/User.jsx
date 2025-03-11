@@ -5,6 +5,7 @@ import { Card, Button, Input, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getContractInstance } from '@/utils/contract';
 import { getContract } from '../Builder/Builder';
+import { useWallet } from '../WalletContext';
 const { TextArea } = Input;
 
 const fieldToFunctionMapping = {
@@ -27,6 +28,7 @@ export default function UserVerification() {
   const [isLoadingField, setIsLoadingField] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { account } = useWallet();
   const handleApplicationClick = (application) => {
     setSelectedApplication(application);
   };
@@ -56,24 +58,26 @@ export default function UserVerification() {
           const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
           console.log({ tokenDetails });
           // const tokenDetailsPlainObject = Object.fromEntries(Object.entries(tokenDetails));
-          // Step 3: Check if `isSignedByOwner` is true
-          // if (tokenDetailsPlainObject[0]) {
-          const image = await contract.tokenURI(tokenId.toString());
-          const getimage = await fetchImage(image);
-          signedTokens.push({
-            id: tokenId,
-            ownerName: tokenDetails[0],
-            userAddress: tokenDetails[2],
-            houseAddress: tokenDetails[1],
-            // number: tokenDetails[3],
-            gender: tokenDetails[4],
-            landArea: tokenDetails[5],
-            pancard: tokenDetails[6],
-            mobileNumber: '9876543210',
-            imageUrl: getimage,
-            status: 'Pending', // Initially status is 'Pending'
-          });
-          // }
+          // console.log(tokenDetails[2].toString() === account.toString());
+          // console.log({ account });
+          // console.log(tokenDetails[2].toString().toLowerCase());
+          if (tokenDetails[2]?.toString().toLowerCase() === account?.toString().toLowerCase()) {
+            const image = await contract.tokenURI(tokenId.toString());
+            const getimage = await fetchImage(image);
+            signedTokens.push({
+              id: tokenId,
+              ownerName: tokenDetails[0],
+              userAddress: tokenDetails[2],
+              houseAddress: tokenDetails[1],
+              // number: tokenDetails[3],
+              gender: tokenDetails[4],
+              landArea: tokenDetails[5],
+              pancard: tokenDetails[6],
+              mobileNumber: '9876543210',
+              imageUrl: getimage,
+              status: tokenDetails[7] === true ? 'Signed' : 'Pending', // Initially status is 'Pending'
+            });
+          }
         }
 
         // Step 4: Set the filtered signed tokens in the state
@@ -86,7 +90,7 @@ export default function UserVerification() {
     };
 
     getSignedTokenDetails();
-  }, []);
+  }, [account]);
 
   const handleVerify = async (field) => {
     setIsLoadingField(true);
@@ -111,9 +115,11 @@ export default function UserVerification() {
     const contract = await getContract();
     // const functionName = fieldToFunctionMapping[field];
     // if (!functionName) return;
-
-    await contract.userSigned(selectedApplication.id);
+    setLoading(true);
+    const tx = await contract.userSigned(selectedApplication.id);
+    await tx.wait();
     message.success(`You have accepted the details.`);
+    setLoading(false);
   };
 
   if (loading) {
@@ -135,31 +141,35 @@ export default function UserVerification() {
       )}
       {!selectedApplication ? (
         <div className="space-y-4">
-          {signedTokens.map((application) => {
-            return (
-              <div
-                key={application.id.toString()}
-                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
-                onClick={() => handleApplicationClick(application)}
-              >
-                <h3 className="text-xl font-semibold">{application.ownerName}</h3>
-                <p className="text-gray-600">{application.userAddress}</p>
-                <p className="text-sm text-gray-500">
-                  Land Area: {application.landArea.toString()}
-                </p>
-                <p className="text-sm text-gray-500">Status: {application.status}</p>
-              </div>
-            );
-          })}
+          {signedTokens.length === 0 ? (
+            <p className="text-center text-lg text-gray-500">No applications</p>
+          ) : (
+            signedTokens.map((application) => {
+              return (
+                <div
+                  key={application.id.toString()}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
+                  onClick={() => handleApplicationClick(application)}
+                >
+                  <h3 className="text-xl font-semibold">{application.ownerName}</h3>
+                  <p className="text-gray-600">{application.userAddress}</p>
+                  <p className="text-sm text-gray-500">
+                    Land Area: {application.landArea.toString()}
+                  </p>
+                  <p className="text-sm text-gray-500">Status: {application.status}</p>
+                </div>
+              );
+            })
+          )}
         </div>
       ) : (
         <div className="flex justify-center items-center min-h-screen p-4 text-white">
           <Card className="w-full max-w-lg shadow-lg bg-gray-900 p-6 rounded-2xl">
             <h2 className="text-2xl font-semibold text-center mb-6">Verify Property Details</h2>
-
             {Object.entries(selectedApplication).map(([key, value]) => {
               if (key === 'id' || key === 'userAddress' || key === 'imageUrl' || key === 'status')
                 return;
+
               return (
                 <div key={key} className="mb-4 p-3 bg-[#f8f8f8] rounded-lg">
                   {key === 'imageUrl' ? (
@@ -181,12 +191,16 @@ export default function UserVerification() {
                       <TextArea
                         value={value}
                         onChange={(e) => {
+                          if (key === 'mobileNumber' && !/^\d*$/.test(e.target.value)) {
+                            return; // Prevent non-numeric input
+                          }
                           setSelectedApplication((prev) => {
                             return { ...prev, [key]: e.target.value };
                           });
                         }}
                         className="mt-2"
                         rows={2}
+                        disabled={key === 'landArea' || selectedApplication?.status === 'Signed'}
                       />
                     </>
                   )}
@@ -194,7 +208,11 @@ export default function UserVerification() {
                     <Button
                       icon={<CheckCircleOutlined />}
                       onClick={() => handleVerify(key)}
-                      disabled={isLoadingField}
+                      disabled={
+                        isLoadingField ||
+                        key === 'landArea' ||
+                        selectedApplication?.status === 'Signed'
+                      }
                     >
                       Accept
                     </Button>
@@ -202,18 +220,19 @@ export default function UserVerification() {
                 </div>
               );
             })}
-
             <div className="mt-6 flex gap-4">
               <Button
                 type="primary"
                 className="w-full"
                 onClick={() => handleFinalDecision()}
-                disabled={isLoadingField}
+                disabled={isLoadingField || selectedApplication?.status === 'Signed'}
               >
                 Approve All
               </Button>
             </div>
-
+            {selectedApplication?.status === 'Signed' && (
+              <p> Document is already Verified by User {account} </p>
+            )}
             {finalDecision && (
               <div className="mt-6 p-4 bg-[#f8f8f8] rounded-lg text-center">
                 <p

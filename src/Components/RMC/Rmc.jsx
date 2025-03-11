@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import contractABI from '../../utils/latestRmcAbi.json'; // Ensure the correct path
+import { useWallet } from '../WalletContext';
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -9,6 +10,7 @@ const Rmc = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const contractAddress = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
+  const { account } = useWallet();
 
   const provider = new ethers.providers.JsonRpcProvider(
     'https://alfajores-forno.celo-testnet.org',
@@ -26,7 +28,10 @@ const Rmc = () => {
             const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
 
             // Only fetch and return details if the document is NOT verified by RMC
-            if (tokenObject[7] === true) {
+            if (
+              tokenObject[7] === true &&
+              account?.toString().toLowerCase() === '0x5969ad5abb6d9f1a0336579ad094828d4c3d3140'
+            ) {
               const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
               return {
                 id: tokenId,
@@ -35,7 +40,7 @@ const Rmc = () => {
                 houseAddress: tokenDetails[2],
                 gender: tokenDetails[4],
                 landArea: tokenDetails[5],
-                pancard: tokenDetails[6],
+                pancard: tokenDetails[6], 
                 mobileNumber: '9876543210', // Add real mobile number if available
                 imageUrl,
                 isVerifiedByRMC: tokenDetails[8],
@@ -164,7 +169,9 @@ const Rmc = () => {
                     : 'Approve'}
               </button>
             </div>
-            <p className="mt-2 text-sm text-gray-500">Status: {selectedApplication.status}</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Status: {selectedApplication.isVerifiedByRMC ? 'Verified' : 'Pending'}
+            </p>
           </div>
         </div>
       )}

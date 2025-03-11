@@ -1,6 +1,5 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// Create a context
 const AuthContext = createContext({
   isLoggedIn: false,
   userInfo: null,
@@ -8,21 +7,30 @@ const AuthContext = createContext({
   logout: () => {},
 });
 
-// Create a provider component
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userInfo, setUserInfo] = useState(null); // This will hold the logged-in user info (username and userType)
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('userInfo');
+    if (storedUser) {
+      setUserInfo(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   const login = (username, userType) => {
+    const user = { username, userType };
+    localStorage.setItem('userInfo', JSON.stringify(user));
+    setUserInfo(user);
     setIsLoggedIn(true);
-    setUserInfo({ username, userType });
   };
 
   const logout = () => {
+    localStorage.removeItem('userInfo'); 
     setIsLoggedIn(false);
     setUserInfo(null);
   };
-
   return (
     <AuthContext.Provider value={{ isLoggedIn, userInfo, login, logout }}>
       {children}
