@@ -2,7 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
-import { WalletProvider } from './Components/WalletContext.jsx';
 import { AuthProvider } from './Components/context/AuthContext';
 import { WagmiProvider } from 'wagmi';
 import { config } from '../config';
@@ -13,7 +12,6 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <WalletProvider>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
@@ -23,6 +21,5 @@ createRoot(document.getElementById('root')).render(
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
-    </WalletProvider>
   </StrictMode>,
 );

@@ -1,5 +1,4 @@
 import React from 'react';
-import ConnectWallet from './ConnectWallet';
 import { useAuth } from './context/AuthContext';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 

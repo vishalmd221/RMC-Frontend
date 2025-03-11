@@ -5,8 +5,8 @@ import { Card, Button, Input, message } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { getContractInstance } from '@/utils/contract';
 import { getContract } from '../Builder/Builder';
-import { useWallet } from '../WalletContext';
 const { TextArea } = Input;
+import { useAccount } from 'wagmi';
 
 const fieldToFunctionMapping = {
   ownerName: 'updateName',
@@ -28,7 +28,7 @@ export default function UserVerification() {
   const [isLoadingField, setIsLoadingField] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { account } = useWallet();
+  const { address } = useAccount();
   const handleApplicationClick = (application) => {
     setSelectedApplication(application);
   };
@@ -58,10 +58,10 @@ export default function UserVerification() {
           const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
           console.log({ tokenDetails });
           // const tokenDetailsPlainObject = Object.fromEntries(Object.entries(tokenDetails));
-          // console.log(tokenDetails[2].toString() === account.toString());
-          // console.log({ account });
+          // console.log(tokenDetails[2].toString() === address.toString());
+          // console.log({ address });
           // console.log(tokenDetails[2].toString().toLowerCase());
-          if (tokenDetails[2]?.toString().toLowerCase() === account?.toString().toLowerCase()) {
+          if (tokenDetails[2]?.toString().toLowerCase() === address?.toString().toLowerCase()) {
             const image = await contract.tokenURI(tokenId.toString());
             const getimage = await fetchImage(image);
             signedTokens.push({
@@ -90,7 +90,7 @@ export default function UserVerification() {
     };
 
     getSignedTokenDetails();
-  }, [account]);
+  }, [address]);
 
   const handleVerify = async (field) => {
     setIsLoadingField(true);
@@ -140,7 +140,7 @@ export default function UserVerification() {
         </button>
       )}
       {!selectedApplication ? (
-        <div className="space-y-4">
+        <div className="space-y-4 flex items-center flex-col">
           {signedTokens.length === 0 ? (
             <p className="text-center text-lg text-gray-500">No applications</p>
           ) : (
@@ -148,7 +148,7 @@ export default function UserVerification() {
               return (
                 <div
                   key={application.id.toString()}
-                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer text-start max-w-fit"
                   onClick={() => handleApplicationClick(application)}
                 >
                   <h3 className="text-xl font-semibold">{application.ownerName}</h3>
@@ -231,7 +231,7 @@ export default function UserVerification() {
               </Button>
             </div>
             {selectedApplication?.status === 'Signed' && (
-              <p> Document is already Verified by User {account} </p>
+              <p> Document is already Verified by User {address} </p>
             )}
             {finalDecision && (
               <div className="mt-6 p-4 bg-[#f8f8f8] rounded-lg text-center">

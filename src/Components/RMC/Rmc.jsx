@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import contractABI from '../../utils/latestRmcAbi.json'; // Ensure the correct path
-import { useWallet } from '../WalletContext';
+import { useAccount } from 'wagmi';
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -10,7 +10,7 @@ const Rmc = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const contractAddress = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
-  const { account } = useWallet();
+  const { address } = useAccount();
 
   const provider = new ethers.providers.JsonRpcProvider(
     'https://alfajores-forno.celo-testnet.org',
@@ -30,7 +30,7 @@ const Rmc = () => {
             // Only fetch and return details if the document is NOT verified by RMC
             if (
               tokenObject[7] === true &&
-              account?.toString().toLowerCase() === '0x5969ad5abb6d9f1a0336579ad094828d4c3d3140'
+              address?.toString().toLowerCase() === '0x5969ad5abb6d9f1a0336579ad094828d4c3d3140'
             ) {
               const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
               return {
@@ -97,7 +97,7 @@ const Rmc = () => {
   return (
     <div className="h-screen p-8 bg-gray-100">
       {!selectedApplication ? (
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           {signedTokens.length === 0 ? (
             <p className="text-center text-lg text-gray-500">No applications</p>
           ) : (
