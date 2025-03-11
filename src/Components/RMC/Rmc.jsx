@@ -1,106 +1,112 @@
-import React, { useState } from 'react';
+import { ethers } from 'ethers';
+import React, { useEffect, useState } from 'react';
+import contractABI from '../../utils/rmcABI (1).json'; // Ensure the correct path
 
 const Rmc = () => {
-  // Dummy application data for the RMC to review
-  const applications = [
-    {
-      id: 1,
-      ownerName: 'John Doe',
-      userAddress: '123 Main St',
-      ipfsHash: 'QmT1m3FVYbFsd77d8Wz5p8DSu8tjhsJrXr7RVA9rp6sfuN',
-      gender: 'Male',
-      landArea: '1200 sq ft',
-      pancard: 'ABCD1234E',
-      houseAddress: '456 Elm St',
-      mobileNumber: '9876543210',
-      imageUrl:
-        'https://media.istockphoto.com/id/474917902/photo/modern-architecture-design-100-for-house-bungalow.jpg?s=612x612&w=0&k=20&c=w5sBVyE-1ZmGmLdtK0F808826hMOyeVOiGYN2H17bOg=',
-      status: 'Pending', // Initially status is 'Pending'
-    },
-    {
-      id: 2,
-      ownerName: 'Jane Smith',
-      userAddress: '456 Oak Rd',
-      ipfsHash: 'QmV3F6Tx5VVkt6bYkK4erA5a5TTqsaTHg2hn3XwvDjmzaG',
-      gender: 'Female',
-      landArea: '1500 sq ft',
-      pancard: 'EFGH5678F',
-      houseAddress: '789 Pine Ave',
-      mobileNumber: '9988776655',
-      imageUrl:
-        'https://media.istockphoto.com/id/474917902/photo/modern-architecture-design-100-for-house-bungalow.jpg?s=612x612&w=0&k=20&c=w5sBVyE-1ZmGmLdtK0F808826hMOyeVOiGYN2H17bOg=',
-      status: 'Pending', // Initially status is 'Pending'
-    },
-    // More applications can be added
-  ];
-
+  const [signedTokens, setSignedTokens] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const contractAddress = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
 
-  // Handle clicking on an application
-  const handleApplicationClick = (application) => {
-    setSelectedApplication(application);
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://celo-alfajores.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
+  );
+  const contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+  useEffect(() => {
+    const fetchSignedTokens = async () => {
+      try {
+        const allTokenIds = await contract.getAllTokenIds();
+        const signedTokensData = await Promise.all(
+          allTokenIds.map(async (tokenId) => {
+            const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
+            const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
+
+            // Only fetch and return details if the document is NOT verified by RMC
+            if (tokenObject[7] === true && tokenObject[8] === false) {
+              const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
+              return {
+                id: tokenId,
+                ownerName: tokenDetails[0],
+                userAddress: tokenDetails[1],
+                houseAddress: tokenDetails[2],
+                gender: tokenDetails[4],
+                landArea: tokenDetails[5],
+                pancard: tokenDetails[6],
+                mobileNumber: '9876543210', // Add real mobile number if available
+                imageUrl,
+                isVerifiedByRMC: tokenDetails[8],
+              };
+            }
+            return null; // Don't include verified tokens
+          }),
+        );
+        setSignedTokens(signedTokensData.filter(Boolean)); // Remove null entries
+      } catch (error) {
+        console.error('Error fetching signed tokens:', error);
+      }
+      setLoading(false);
+    };
+    fetchSignedTokens();
+  }, []);
+
+  const fetchImage = async (tokenURI) => {
+    try {
+      const response = await fetch(tokenURI);
+      const metadata = await response.json();
+      return metadata.image;
+    } catch (error) {
+      console.error('Error fetching image:', error);
+      return '';
+    }
   };
 
-  // Handle clicking on the image to show the modal
-  const handleImageClick = () => {
-    setIsImageModalOpen(true);
-  };
-
-  // Handle closing the image modal
-  const handleCloseImageModal = () => {
-    setIsImageModalOpen(false);
-  };
-
-  // Handle going back to the application list
-  const handleBackToList = () => {
-    setSelectedApplication(null);
-  };
-
-  // Handle application approval
-  const handleApprove = () => {
-    if (selectedApplication) {
-      setSelectedApplication({
-        ...selectedApplication,
-        status: 'Approved', // Set the status to 'Approved'
-      });
+  const handleApprove = async (tokenId) => {
+    try {
+      const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = await newProvider.getSigner();
+      const contractWithSigner = new ethers.Contract(contractAddress, contractABI, signer);
+      const tx = await contractWithSigner.verifyDoc(tokenId);
+      await tx.wait();
       alert(`Application for ${selectedApplication.ownerName} has been approved.`);
+      setSelectedApplication((prev) => ({ ...prev, status: 'Approved' }));
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      alert(error.data.message);
     }
   };
 
-  // Handle application decline
-  const handleDecline = () => {
-    if (selectedApplication) {
-      setSelectedApplication({
-        ...selectedApplication,
-        status: 'Declined', // Set the status to 'Declined'
-      });
-      alert(`Application for ${selectedApplication.ownerName} has been declined.`);
-    }
-  };
-
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500">Loading applications...</p>
+      </div>
+    );
+  }
   return (
     <div className="h-screen p-8 bg-gray-100">
-      {/* If no application is selected, show the list of applications */}
       {!selectedApplication ? (
         <div className="space-y-4">
-          {applications.map((application) => (
+          {signedTokens.map((app) => (
             <div
-              key={application.id}
+              key={app.id.toString()}
               className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer"
-              onClick={() => handleApplicationClick(application)}
+              onClick={() => setSelectedApplication(app)}
             >
-              <h3 className="text-xl font-semibold">{application.ownerName}</h3>
-              <p className="text-gray-600">{application.userAddress}</p>
-              <p className="text-sm text-gray-500">Land Area: {application.landArea}</p>
-              <p className="text-sm text-gray-500">Status: {application.status}</p>
+              <h3 className="text-xl font-semibold">{app.ownerName}</h3>
+              <p className="text-gray-600">{app.userAddress}</p>
+              <p className="text-sm text-gray-500">Land Area: {app.landArea.toString()}</p>
+              <p className="text-sm text-gray-500">Status: {app.status}</p>
             </div>
           ))}
         </div>
       ) : (
-        // If an application is selected, show the details
         <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
-          <button onClick={handleBackToList} className="text-blue-500 underline mb-4">
+          <button
+            onClick={() => setSelectedApplication(null)}
+            className="text-blue-500 underline mb-4"
+          >
             Back to Application List
           </button>
           <h2 className="text-2xl font-semibold">Application Details</h2>
@@ -115,7 +121,7 @@ const Rmc = () => {
               <strong>Gender:</strong> {selectedApplication.gender}
             </p>
             <p>
-              <strong>Land Area:</strong> {selectedApplication.landArea}
+              <strong>Land Area:</strong> {selectedApplication.landArea.toString()}
             </p>
             <p>
               <strong>PAN Card:</strong> {selectedApplication.pancard}
@@ -126,41 +132,20 @@ const Rmc = () => {
             <p>
               <strong>Mobile Number:</strong> {selectedApplication.mobileNumber}
             </p>
-            <p>
-              <strong>IPFS Hash:</strong>{' '}
-              <a
-                href={`https://ipfs.io/ipfs/${selectedApplication.ipfsHash}`}
-                className="text-blue-500"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {selectedApplication.ipfsHash}
-              </a>
-            </p>
-
-            {/* Image with click to enlarge */}
             <div className="mt-5 flex justify-center">
               <img
                 src={selectedApplication.imageUrl}
-                alt="Application Image"
+                alt="Application"
                 className="w-50 h-50 object-cover rounded-md cursor-pointer"
-                onClick={handleImageClick}
+                onClick={() => setIsImageModalOpen(true)}
               />
             </div>
-
-            {/* Approve and Decline buttons */}
-            <div className="mt-6 flex justify-center gap-x-4">
+            <div className="mt-6 flex justify-center">
               <button
-                onClick={handleApprove}
+                onClick={() => handleApprove(selectedApplication.id)}
                 className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
               >
                 Approve
-              </button>
-              <button
-                onClick={handleDecline}
-                className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-              >
-                Decline
               </button>
             </div>
             <p className="mt-2 text-sm text-gray-500">Status: {selectedApplication.status}</p>
@@ -168,19 +153,18 @@ const Rmc = () => {
         </div>
       )}
 
-      {/* Image Modal */}
       {isImageModalOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="relative bg-white p-4 rounded-lg max-w-4xl">
             <button
-              onClick={handleCloseImageModal}
+              onClick={() => setIsImageModalOpen(false)}
               className="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-2"
             >
               &times;
             </button>
             <img
               src={selectedApplication.imageUrl}
-              alt="Application Image"
+              alt="Application"
               className="max-w-full max-h-96 object-contain"
             />
           </div>
