@@ -9,9 +9,7 @@ const Rmc = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const contractAddress = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
 
-  const provider = new ethers.providers.JsonRpcProvider(
-    'https://celo-alfajores.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
-  );
+  const provider = new ethers.providers.JsonRpcProvider('https://alfajores-forno.celo-testnet.org');
   const contract = new ethers.Contract(contractAddress, contractABI, provider);
 
   useEffect(() => {
@@ -24,7 +22,7 @@ const Rmc = () => {
             const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
 
             // Only fetch and return details if the document is NOT verified by RMC
-            if (tokenObject[7] === true && tokenObject[8] === false) {
+            if (tokenObject[7] === true) {
               const imageUrl = await fetchImage(await contract.tokenURI(tokenId.toString()));
               return {
                 id: tokenId,
@@ -64,6 +62,7 @@ const Rmc = () => {
 
   const handleApprove = async (tokenId) => {
     try {
+      // @ts-ignore
       const newProvider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await newProvider.getSigner();
       const contractWithSigner = new ethers.Contract(contractAddress, contractABI, signer);
@@ -144,11 +143,11 @@ const Rmc = () => {
               <button
                 onClick={() => handleApprove(selectedApplication.id)}
                 className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                disabled={!selectedApplication.isVerifiedByRMC}
               >
-                Approve
+                {selectedApplication.isVerifiedByRMC ? 'Already Verified' : 'Approve'}
               </button>
             </div>
-            <p className="mt-2 text-sm text-gray-500">Status: {selectedApplication.status}</p>
           </div>
         </div>
       )}
