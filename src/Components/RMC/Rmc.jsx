@@ -40,7 +40,7 @@ const Rmc = () => {
                 houseAddress: tokenDetails[2],
                 gender: tokenDetails[4],
                 landArea: tokenDetails[5],
-                pancard: tokenDetails[6], 
+                pancard: tokenDetails[6],
                 mobileNumber: '9876543210', // Add real mobile number if available
                 imageUrl,
                 isVerifiedByRMC: tokenDetails[8],

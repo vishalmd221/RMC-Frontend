@@ -37,7 +37,7 @@ const Login = () => {
       alert('Invalid credentials!');
     }
   };
-  
+
   return (
     <div className="h-screen flex justify-center items-center bg-gray-100 p-6 text-center">
       <div className="w-full max-w-sm p-6 bg-white rounded-lg shadow-md">

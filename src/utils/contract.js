@@ -6,7 +6,6 @@ import CONTRACT_ABI from './latestRmcAbi';
 const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9'; // Your contract address
 const INFURA_RPC_URL = import.meta.env.VITE_INFURA_RPC_URL;
 
-
 // ✅ Correcting the provider instantiation
 const provider = new ethers.providers.JsonRpcProvider(INFURA_RPC_URL);
 
