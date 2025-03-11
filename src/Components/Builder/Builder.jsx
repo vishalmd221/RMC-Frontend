@@ -6,10 +6,10 @@ import { UploadOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { ethers } from 'ethers';
 // @ts-ignore
-import CONTRACT_ABI from '../../utils/rmcABI (1).json';
+import CONTRACT_ABI from '../../utils/latestRmcAbi';
 
 // Contract address
-const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49';
+const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
 
 // Function to get the contract instance
 export const getContract = async () => {
@@ -39,7 +39,7 @@ export default function CertificateIssuer() {
 
   // Handle file upload
   const handleUpload = (e) => {
-    console.log({e})
+    console.log({ e });
     setFileList(e.target.files[0]);
     // if (info.file.status === 'done') {
     //   message.success(`${info.file.name} uploaded successfully`);
@@ -115,7 +115,7 @@ export default function CertificateIssuer() {
       };
 
       // Call smart contract function
-      const tx = await contract.createDocByBuilder(propertyDetails, metadatanft);
+      const tx = await contract.createByBuilder(propertyDetails, metadatanft);
       await tx.wait();
 
       setTransactionHash(tx.hash);
@@ -207,7 +207,7 @@ export default function CertificateIssuer() {
           </Form>
 
           {transactionHash && (
-            <div className="mt-6 p-4 bg-gray-700 rounded-lg text-center">
+            <div className="mt-6 p-4 bg-white-700 rounded-lg text-center">
               <p className="text-green-400">Certificate Issued on Blockchain!</p>
               <p className="text-sm break-all">{transactionHash}</p>
             </div>

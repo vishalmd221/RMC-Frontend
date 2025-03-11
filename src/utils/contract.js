@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { ethers } from 'ethers';
-import CONTRACT_ABI from './rmcABI (1).json';
+import CONTRACT_ABI from './latestRmcAbi';
 
 // Load Infura RPC from environment variables
-const CONTRACT_ADDRESS = '0x97d9DB4761505aB98c4247eF380f6A57D543FD49'; // Your contract address
+const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9'; // Your contract address
 const INFURA_RPC_URL = import.meta.env.VITE_INFURA_RPC_URL;
 
 

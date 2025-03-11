@@ -63,8 +63,8 @@ export default function UserVerification() {
           signedTokens.push({
             id: tokenId,
             ownerName: tokenDetails[0],
-            userAddress: tokenDetails[1],
-            houseAddress: tokenDetails[2],
+            userAddress: tokenDetails[2],
+            houseAddress: tokenDetails[1],
             // number: tokenDetails[3],
             gender: tokenDetails[4],
             landArea: tokenDetails[5],
@@ -112,7 +112,7 @@ export default function UserVerification() {
     // const functionName = fieldToFunctionMapping[field];
     // if (!functionName) return;
 
-    await contract.signDoc(selectedApplication.id);
+    await contract.userSigned(selectedApplication.id);
     message.success(`You have accepted the details.`);
   };
 
