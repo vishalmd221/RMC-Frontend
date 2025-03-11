@@ -1,6 +1,7 @@
 import React from 'react';
 import ConnectWallet from './ConnectWallet';
 import { useAuth } from './context/AuthContext';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const Header = () => {
   const { logout } = useAuth();
@@ -16,7 +17,7 @@ const Header = () => {
           <button className="h-[42px] p-2" onClick={logout}>
             LogOut
           </button>
-          <ConnectWallet />
+          <ConnectButton />
         </div>
       </div>
     </header>
