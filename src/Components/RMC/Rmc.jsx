@@ -119,36 +119,36 @@ const Rmc = () => {
         </div>
       ) : (
         <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
-          <button
-            onClick={() => setSelectedApplication(null)}
-            className="text-blue-500 underline mb-4"
-          >
+          <button onClick={() => setSelectedApplication(null)} className="text-blue-50 mb-4">
             Back to Application List
           </button>
           <h2 className="text-2xl font-semibold">Application Details</h2>
-          <div className="mt-4">
-            <p>
-              <strong>Owner Name:</strong> {selectedApplication.ownerName}
-            </p>
-            <p>
-              <strong>User Address:</strong> {selectedApplication.userAddress}
-            </p>
-            <p>
-              <strong>Gender:</strong> {selectedApplication.gender}
-            </p>
-            <p>
-              <strong>Land Area:</strong> {selectedApplication.landArea.toString()}
-            </p>
-            <p>
-              <strong>PAN Card:</strong> {selectedApplication.pancard}
-            </p>
-            <p>
-              <strong>House Address:</strong> {selectedApplication.userAddress}
-            </p>
-            <p>
-              <strong>Mobile Number:</strong> {selectedApplication.mobileNumber}
-            </p>
-            <div className="mt-5 flex justify-center">
+          <div className="mt-4 flex justify-around items-center">
+            <div className="flex flex-col items-start">
+              <p>
+                <strong>Owner Name:</strong> {selectedApplication.ownerName}
+              </p>
+              <p>
+                <strong>User Address:</strong> {selectedApplication.userAddress}
+              </p>
+              <p>
+                <strong>Gender:</strong> {selectedApplication.gender}
+              </p>
+              <p>
+                <strong>Land Area:</strong> {selectedApplication.landArea.toString()}
+              </p>
+              <p>
+                <strong>PAN Card:</strong> {selectedApplication.pancard}
+              </p>
+              <p>
+                <strong>House Address:</strong> {selectedApplication.userAddress}
+              </p>
+              <p>
+                <strong>Mobile Number :</strong> {selectedApplication.mobileNumber}
+              </p>
+            </div>
+            <div className="mt-5 flex flex-col justify-center">
+              <strong>Land Image:</strong>
               <img
                 src={selectedApplication.imageUrl}
                 alt="Application"
@@ -156,23 +156,23 @@ const Rmc = () => {
                 onClick={() => setIsImageModalOpen(true)}
               />
             </div>
-            <div className="mt-6 flex justify-center">
-              <button
-                onClick={() => handleApprove(selectedApplication.id)}
-                className={`px-6 py-2 rounded-md ${selectedApplication.isVerifiedByRMC || approving ? '!bg-gray-500 !cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 '} text-white`}
-                disabled={selectedApplication.isVerifiedByRMC && approving}
-              >
-                {selectedApplication.isVerifiedByRMC
-                  ? 'Already Verified'
-                  : approving
-                    ? 'Approving...'
-                    : 'Approve'}
-              </button>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              Status: {selectedApplication.isVerifiedByRMC ? 'Verified' : 'Pending'}
-            </p>
           </div>
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={() => handleApprove(selectedApplication.id)}
+              className={`px-6 py-2 rounded-md ${selectedApplication.isVerifiedByRMC || approving ? '!bg-gray-500 !cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 '} text-white`}
+              disabled={selectedApplication.isVerifiedByRMC && approving}
+            >
+              {selectedApplication.isVerifiedByRMC
+                ? 'Already Verified'
+                : approving
+                  ? 'Approving...'
+                  : 'Approve'}
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            Status: {selectedApplication.isVerifiedByRMC ? 'Verified' : 'Pending'}
+          </p>
         </div>
       )}
 

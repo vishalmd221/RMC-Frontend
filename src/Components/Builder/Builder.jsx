@@ -205,7 +205,11 @@ export default function CertificateIssuer() {
               {/* <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
                 <Button icon={<UpsloadOutlined />}>Click to Upload</Button>
               </Upload> */}
-              <input type="file" onChange={handleUpload} />
+              <input
+                className="border-[1px] border-[#cfcfcf] border-solid"
+                type="file"
+                onChange={handleUpload}
+              />
             </Form.Item>
             <Button
               type="primary"
