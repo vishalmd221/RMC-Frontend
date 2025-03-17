@@ -9,7 +9,7 @@ import { ethers } from 'ethers';
 import CONTRACT_ABI from '../../utils/latestRmcAbi';
 
 // Contract address
-const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
+const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
 
 // Function to get the contract instance
 export const getContract = async () => {
@@ -42,12 +42,6 @@ export default function CertificateIssuer() {
   const handleUpload = (e) => {
     console.log({ e });
     setFileList(e.target.files[0]);
-    // if (info.file.status === 'done') {
-    //   message.success(`${info.file.name} uploaded successfully`);
-    //   setFileList([info.file]);
-    // } else if (info.file.status === 'error') {
-    //   message.error(`${info.file.name} upload failed.`);
-    // }
   };
 
   const onFinish = async (values) => {
@@ -67,9 +61,7 @@ export default function CertificateIssuer() {
 
       if (!response.ok) return;
       const data = await response.json();
-      // setIpfsData(data);
-      // setUploadStatus(`File uploaded successfully!`);
-
+      
       const metadata = {
         description: 'WELCOME TO MY HOUSE',
         external_url: 'https://openseacreatures.io/3',
@@ -93,16 +85,16 @@ export default function CertificateIssuer() {
       });
 
       const jsonData = await jsonResponse.json();
-      console.log('JSON Metadata uploaded:', jsonData);
-      console.log('IpfsHash', jsonData.IpfsHash);
+      // console.log('JSON Metadata uploaded:', jsonData);
+      // console.log('IpfsHash', jsonData.IpfsHash);
 
       const metadatanft = `https://ipfs.io/ipfs/${jsonData.IpfsHash}`; // link of pinata where we are storing hash
-      console.log(metadatanft, 'metadatanft');
-      console.log({ metadatanft });
+      // console.log(metadatanft, 'metadatanft');
+      // console.log({ metadatanft });
 
       const contract = await getContract();
       if (!contract) return;
-      console.log('Form Data:', values);
+      // console.log('Form Data:', values);
 
       // Convert form data into Solidity `propertyDetails` struct
       const propertyDetails = {
