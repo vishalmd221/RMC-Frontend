@@ -31,7 +31,6 @@ const Rmc = () => {
             const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
 
             const tokenObject = Object.fromEntries(Object.entries(tokenDetails));
-
             if (
               tokenObject[7] === true &&
               address?.toString().toLowerCase() === '0x5969ad5abb6d9f1a0336579ad094828d4c3d3140'
@@ -76,8 +75,13 @@ const Rmc = () => {
   const handleApprove = async (tokenId) => {
     setApproving(true);
     try {
-      const signerContract = await getSignerContract();
-      const tx = await signerContract.rmcApproved(tokenId);
+      const newProvider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = await newProvider.getSigner();
+      const contractWithSigner = new ethers.Contract(CONTRACT_ADDRESS, contractABI).connect(signer);
+      const tx = await contractWithSigner.rmcApproved(tokenId);
+
+      // const signerContract = await getSignerContract();
+      // const tx = await contractWithSigner.rmcApproved(tokenId);
       await tx.wait();
       alert(`Application for ${selectedApplication.ownerName} has been approved.`);
       setSelectedApplication((prev) => ({ ...prev, status: 'Approved' }));
