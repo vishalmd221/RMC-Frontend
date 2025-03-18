@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { getContractInstance, getSignerContract } from '@/utils/contract';
+import { getContract } from '../Builder/Builder';
+import { ethers } from 'ethers';
+import contractABI from '../../utils/latestRmcAbi.json';
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -10,7 +13,15 @@ const Rmc = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { address } = useAccount();
 
-  const contract = getContractInstance();
+  // const contract = getContract();
+  // // const contract = getContractInstance();
+
+  const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
+  const provider = new ethers.providers.JsonRpcProvider(
+    'https://alfajores-forno.celo-testnet.org',
+    // 'https://celo-alfajores.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
+  );
+  const contract = new ethers.Contract(CONTRACT_ADDRESS, contractABI, provider);
   useEffect(() => {
     const fetchSignedTokens = async () => {
       try {

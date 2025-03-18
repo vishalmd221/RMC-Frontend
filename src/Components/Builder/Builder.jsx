@@ -6,11 +6,10 @@ import { UploadOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { ethers } from 'ethers';
 // @ts-ignore
-import CONTRACT_ABI from '../../utils/latestRmcAbi';
+import CONTRACT_ABI from '../../utils/latestRmcAbi.json';
 
 // Contract address
-const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
-
+const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
 // Function to get the contract instance
 export const getContract = async () => {
   try {
@@ -20,7 +19,7 @@ export const getContract = async () => {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    const network = await provider.getNetwork();
+    // const network = await provider.getNetwork();
     // console.log('Connected Network:', network);
 
     const signer = provider.getSigner();
@@ -61,7 +60,7 @@ export default function CertificateIssuer() {
 
       if (!response.ok) return;
       const data = await response.json();
-      
+
       const metadata = {
         description: 'WELCOME TO MY HOUSE',
         external_url: 'https://openseacreatures.io/3',
@@ -100,7 +99,7 @@ export default function CertificateIssuer() {
       const propertyDetails = {
         Name: values.ownerName,
         Address: values.landAddress,
-        ownerAddress: values.ownerAddress,
+        ownerAddress: values.ownerWalletAddress,
         Number: parseInt(values.mobileNumber, 10),
         Gender: values.gender,
         SqFoot: parseInt(values.landArea, 10),
