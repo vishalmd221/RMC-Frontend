@@ -27,7 +27,7 @@ export default function UserVerification() {
   const [finalDecision, setFinalDecision] = useState(null);
   const [isLoadingField, setIsLoadingField] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const { address } = useAccount();
   const handleApplicationClick = (application) => {
     setSelectedApplication(application);
@@ -51,12 +51,12 @@ export default function UserVerification() {
       try {
         // Step 1: Fetch all token IDs
         const allTokenIds = await contract.getAllTokenIds();
-        console.log({ allTokenIds });
+        // console.log({ allTokenIds });
         const signedTokens = [];
         for (let i = 0; i < allTokenIds.length; i++) {
           const tokenId = allTokenIds[i];
           const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
-          console.log({ tokenDetails });
+          // console.log({ tokenDetails });
           // const tokenDetailsPlainObject = Object.fromEntries(Object.entries(tokenDetails));
           // console.log(tokenDetails[2].toString() === address.toString());
           // console.log({ address });
@@ -97,13 +97,13 @@ export default function UserVerification() {
     try {
       // setVerification((prev) => ({ ...prev, [field]: status }));
       const contract = await getContract();
-      console.log({ contract });
+      // console.log({ contract });
 
       const functionName = fieldToFunctionMapping[field];
       if (!functionName) return;
 
       await contract[functionName](selectedApplication.id, selectedApplication[field]);
-      console.log({ contract, field });
+      // console.log({ contract, field });
     } catch (error) {
       console.log(error);
     } finally {
@@ -130,7 +130,7 @@ export default function UserVerification() {
       </div>
     );
   }
-  console.log({ selectedApplication, signedTokens });
+  // console.log({ selectedApplication, signedTokens });
 
   return (
     <>

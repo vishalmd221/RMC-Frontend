@@ -15,7 +15,7 @@ export const getContractInstance = () => {
 export const getSignerContract = async () => {
   const PRIVATE_KEY = import.meta.env.VITE_WALLET_PRIVATE_KEY; // Load securely
   const signer = await provider.getSigner();
-  console.log({ signer });
+  // console.log({ signer });
   // const signer = new ethers.Wallet(PRIVATE_KEY, provider);
   return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
 };

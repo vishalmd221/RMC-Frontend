@@ -21,7 +21,7 @@ export const getContract = async () => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
 
     const network = await provider.getNetwork();
-    console.log('Connected Network:', network);
+    // console.log('Connected Network:', network);
 
     const signer = provider.getSigner();
 
@@ -40,7 +40,7 @@ export default function CertificateIssuer() {
 
   // Handle file upload
   const handleUpload = (e) => {
-    console.log({ e });
+    // console.log({ e });
     setFileList(e.target.files[0]);
   };
 
@@ -49,7 +49,7 @@ export default function CertificateIssuer() {
       setLoading(true); // Disable the button when the transaction starts
 
       const formData = new FormData();
-      console.log(fileList, ' fileList');
+      // console.log(fileList, ' fileList');
       formData.append('file', fileList);
       const response = await fetch('https://rmc-backend-rabl.onrender.com/upload', {
         method: 'POST',

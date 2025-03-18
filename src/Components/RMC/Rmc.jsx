@@ -10,7 +10,7 @@ const Rmc = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { address } = useAccount();
 
-  const contract = getContractInstance(); 
+  const contract = getContractInstance();
   useEffect(() => {
     const fetchSignedTokens = async () => {
       try {
