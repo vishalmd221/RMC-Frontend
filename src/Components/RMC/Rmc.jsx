@@ -49,7 +49,7 @@ const Rmc = () => {
       setLoading(false);
     };
     fetchSignedTokens();
-  }, []);
+  }, [address]);
 
   const fetchImage = async (tokenURI) => {
     try {
