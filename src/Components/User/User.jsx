@@ -27,7 +27,7 @@ export default function UserVerification() {
   const [finalDecision, setFinalDecision] = useState(null);
   const [isLoadingField, setIsLoadingField] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const { address } = useAccount();
   const handleApplicationClick = (application) => {
     setSelectedApplication(application);
@@ -73,13 +73,13 @@ export default function UserVerification() {
               gender: tokenDetails[4],
               landArea: tokenDetails[5],
               pancard: tokenDetails[6],
-              mobileNumber: '9876543210',
+              mobileNumber: parseInt(tokenDetails[3], 10),
               imageUrl: getimage,
               status: tokenDetails[7] === true ? 'Signed' : 'Pending', // Initially status is 'Pending'
             });
           }
         }
-
+        // console.log({signedTokens});
         // Step 4: Set the filtered signed tokens in the state
         setSignedTokens(signedTokens);
         setLoading(false);
@@ -168,8 +168,7 @@ export default function UserVerification() {
           <Card className="w-full max-w-lg shadow-lg bg-gray-900 p-6 rounded-2xl">
             <h2 className="text-2xl font-semibold text-center mb-6">Verify Property Details</h2>
             {Object.entries(selectedApplication).map(([key, value]) => {
-              if (key === 'id' || key === 'userAddress'  || key === 'status')
-                return;
+              if (key === 'id' || key === 'userAddress' || key === 'status') return;
 
               return (
                 <div key={key} className="mb-4 p-3 bg-[#f8f8f8] rounded-lg">
@@ -211,7 +210,8 @@ export default function UserVerification() {
                       onClick={() => handleVerify(key)}
                       disabled={
                         isLoadingField ||
-                        key === 'landArea' ||key==='imageUrl'||
+                        key === 'landArea' ||
+                        key === 'imageUrl' ||
                         selectedApplication?.status === 'Signed'
                       }
                     >

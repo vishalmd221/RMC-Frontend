@@ -44,7 +44,7 @@ const Rmc = () => {
                 gender: tokenDetails[4],
                 landArea: tokenDetails[5],
                 pancard: tokenDetails[6],
-                mobileNumber: '9876543210', // Add real mobile number if available
+                mobileNumber: parseInt(tokenDetails[3], 10), 
                 imageUrl,
                 isVerifiedByRMC: tokenDetails[8],
               };
