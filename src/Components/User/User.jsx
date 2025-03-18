@@ -16,8 +16,8 @@ const fieldToFunctionMapping = {
   landArea: 'updateSqFoot',
   pancard: 'updatePanCardNumber',
   mobileNumber: 'updateNumber',
-  // imageUrl:
-  //   'https://brown-leading-scallop-142.mypinata.cloud/ipfs/Qmc1W1hCoEfuZw7MVaR1djRde9oTNXpiEx3ChmWekxcABk',
+  imageUrl:
+    'https://brown-leading-scallop-142.mypinata.cloud/ipfs/Qmc1W1hCoEfuZw7MVaR1djRde9oTNXpiEx3ChmWekxcABk',
   // status: 'Pending',
 };
 
@@ -168,7 +168,7 @@ export default function UserVerification() {
           <Card className="w-full max-w-lg shadow-lg bg-gray-900 p-6 rounded-2xl">
             <h2 className="text-2xl font-semibold text-center mb-6">Verify Property Details</h2>
             {Object.entries(selectedApplication).map(([key, value]) => {
-              if (key === 'id' || key === 'userAddress' || key === 'imageUrl' || key === 'status')
+              if (key === 'id' || key === 'userAddress'  || key === 'status')
                 return;
 
               return (
@@ -211,7 +211,7 @@ export default function UserVerification() {
                       onClick={() => handleVerify(key)}
                       disabled={
                         isLoadingField ||
-                        key === 'landArea' ||
+                        key === 'landArea' ||key==='imageUrl'||
                         selectedApplication?.status === 'Signed'
                       }
                     >
