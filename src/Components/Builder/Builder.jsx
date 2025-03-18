@@ -147,11 +147,11 @@ export default function CertificateIssuer() {
               <Input placeholder="Enter Mobile Number" />
             </Form.Item>
             <Form.Item
-              label="Owner Address"
-              name="ownerAddress"
-              rules={[{ required: true, message: 'Enter Owner Address' }]}
+              label="Owner Wallet Address"
+              name="ownerWalletAddress"
+              rules={[{ required: true, message: 'Enter Owner Wallet Address' }]}
             >
-              <Input placeholder="Enter Owner Address" />
+              <Input placeholder="Enter Owner Wallet Address" />
             </Form.Item>
             <Form.Item
               label="Gender"
