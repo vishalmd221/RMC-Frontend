@@ -25,6 +25,7 @@ const Rmc = () => {
   useEffect(() => {
     const fetchSignedTokens = async () => {
       try {
+        setLoading(true);
         const allTokenIds = await contract.getAllTokenIds();
         const signedTokensData = await Promise.all(
           allTokenIds.map(async (tokenId) => {
@@ -44,7 +45,7 @@ const Rmc = () => {
                 gender: tokenDetails[4],
                 landArea: tokenDetails[5],
                 pancard: tokenDetails[6],
-                mobileNumber: parseInt(tokenDetails[3], 10), 
+                mobileNumber: parseInt(tokenDetails[3], 10),
                 imageUrl,
                 isVerifiedByRMC: tokenDetails[8],
               };

@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { Card, Button, Input, message } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import { getContractInstance } from '@/utils/contract';
 import { getContract } from '../Builder/Builder';
 const { TextArea } = Input;
@@ -50,6 +50,7 @@ export default function UserVerification() {
     const getSignedTokenDetails = async () => {
       try {
         // Step 1: Fetch all token IDs
+        setLoading(true);
         const allTokenIds = await contract.getAllTokenIds();
         // console.log({ allTokenIds });
         const signedTokens = [];
