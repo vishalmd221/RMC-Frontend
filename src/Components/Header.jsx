@@ -6,10 +6,10 @@ const Header = () => {
   const { logout } = useAuth();
 
   return (
-    <header className="bg-blue-600 text-white p-4 shadow-md">
+    <header className="bg-[#1E3A8A] text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <div className="text-white text-[25px]">RMC Blockchain App</div>
+        <div className="text-white text-[25px] font-semibold">RMC Blockchain App</div>
 
         {/* Connect/Disconnect Button */}
         <div className="flex items-center justify-between gap-x-4">
