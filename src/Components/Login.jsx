@@ -4,25 +4,25 @@ import { useAuth } from './context/AuthContext';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('User');
+  const [userType, setUserType] = useState('Buyer');
   const { login } = useAuth();
 
   // Static user data based on user type
   const users = {
-    User: [
-      { username: 'user1', password: 'pass1' },
-      { username: 'user2', password: 'pass2' },
-      { username: 'user3', password: 'pass3' },
+    Buyer: [
+      { username: 'buyer1', password: 'pass1' },
+      { username: 'buyer2', password: 'pass2' },
+      { username: 'buyer3', password: 'pass3' },
     ],
     RMC: [
       { username: 'rmc1', password: 'pass1' },
       { username: 'rmc2', password: 'pass2' },
       { username: 'rmc3', password: 'pass3' },
     ],
-    Builder: [
-      { username: 'builder1', password: 'pass1' },
-      { username: 'builder2', password: 'pass2' },
-      { username: 'builder3', password: 'pass3' },
+    Seller: [
+      { username: 'seller1', password: 'pass1' },
+      { username: 'seller2', password: 'pass2' },
+      { username: 'seller3', password: 'pass3' },
     ],
   };
 
@@ -53,9 +53,9 @@ const Login = () => {
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
           >
-            <option value="User">User</option>
-            <option value="RMC">RMC</option>
-            <option value="Builder">Builder</option>
+            <option value="Buyer">Buyer</option>
+            <option value="RMC">RMC Authority</option>
+            <option value="Seller">Seller</option>
           </select>
         </div>
         <div className="mb-4">

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, Button, Input, message } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { getContractInstance } from '@/utils/contract';
-import { getContract } from '../Builder/Builder';
+import { getContract } from '../Seller/Seller';
 const { TextArea } = Input;
 import { useAccount } from 'wagmi';
 
@@ -229,12 +229,13 @@ export default function UserVerification() {
                 onClick={() => handleFinalDecision()}
                 disabled={isLoadingField || selectedApplication?.status === 'Signed'}
               >
-                Approve All
+                Accept All & Sign
               </Button>
             </div>
             {selectedApplication?.status === 'Signed' && (
-              <p> Document is already Verified by User {address} </p>
+              <p> Document is already Verified by Buyer {address} </p>
             )}
+
             {finalDecision && (
               <div className="mt-6 p-4 bg-[#f8f8f8] rounded-lg text-center">
                 <p

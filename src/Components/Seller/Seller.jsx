@@ -146,11 +146,11 @@ export default function CertificateIssuer() {
               <Input placeholder="Enter Mobile Number" />
             </Form.Item>
             <Form.Item
-              label="Owner Wallet Address"
-              name="ownerWalletAddress"
-              rules={[{ required: true, message: 'Enter Owner Wallet Address' }]}
+              label="Owner Wallet Id"
+              name="ownerWalletId"
+              rules={[{ required: true, message: 'Enter Owner Wallet Id' }]}
             >
-              <Input placeholder="Enter Owner Wallet Address" />
+              <Input placeholder="Enter Owner Wallet Id" />
             </Form.Item>
             <Form.Item
               label="Gender"
@@ -209,7 +209,7 @@ export default function CertificateIssuer() {
               disabled={loading}
               loading={loading}
             >
-              {loading ? 'Minting...' : 'Mint Certificate'}
+              {loading ? 'Issuing Certificate...' : 'Issue Certificate'}
             </Button>
           </Form>
 

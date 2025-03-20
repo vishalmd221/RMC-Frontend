@@ -2,8 +2,8 @@ import React from 'react';
 import './App.css';
 import Header from './Components/Header';
 import Login from './Components/Login';
-import BuilderModule from './Components/Builder/Builder';
-import UserModule from './Components/User/User';
+import SellerModule from './Components/Seller/Seller';
+import BuyerModule from './Components/Buyer/Buyer';
 import { useAuth } from './Components/context/AuthContext';
 import Rmc from './Components/RMC/Rmc';
 import { useAccount, useConnect } from 'wagmi';
@@ -30,8 +30,8 @@ function App() {
           <Header />
 
           <div className="container mx-auto py-8 px-4">
-            {userInfo?.userType === 'Builder' && <BuilderModule />}
-            {userInfo?.userType === 'User' && <UserModule />}
+            {userInfo?.userType === 'Seller' && <SellerModule />}
+            {userInfo?.userType === 'Buyer' && <BuyerModule />}
             {userInfo?.userType === 'RMC' && <Rmc />}
           </div>
         </div>

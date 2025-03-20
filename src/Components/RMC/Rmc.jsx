@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
-import { getContractInstance, getSignerContract } from '@/utils/contract';
-import { getContract } from '../Builder/Builder';
 import { ethers } from 'ethers';
 import contractABI from '../../utils/latestRmcAbi.json';
 
@@ -13,8 +11,6 @@ const Rmc = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { address } = useAccount();
 
-  // const contract = getContract();
-  // // const contract = getContractInstance();
 
   const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
   const provider = new ethers.providers.JsonRpcProvider(
@@ -103,7 +99,7 @@ const Rmc = () => {
   }
   return (
     <>
-      <h2 className="text-3xl font-bold text-center mb-8">Approve User Property details</h2>
+      <h2 className="text-3xl font-bold text-center mb-8">Approve Buyer Property details</h2>
       <div className="h-screen p-8 bg-gray-100">
         {!selectedApplication ? (
           <div className="space-y-4 ">
@@ -138,7 +134,7 @@ const Rmc = () => {
                   <strong>Owner Name:</strong> {selectedApplication.ownerName}
                 </p>
                 <p>
-                  <strong>User Address:</strong> {selectedApplication.userAddress}
+                  <strong>Buyer Address:</strong> {selectedApplication.userAddress}
                 </p>
                 <p>
                   <strong>Gender:</strong> {selectedApplication.gender}

@@ -16,7 +16,7 @@ const Header = () => {
           <button className="h-[42px] p-2" onClick={logout}>
             LogOut
           </button>
-          <ConnectButton />
+          <ConnectButton label="Connect Certificate Wallet" />
         </div>
       </div>
     </header>
