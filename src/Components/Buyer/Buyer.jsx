@@ -117,8 +117,8 @@ export default function UserVerification() {
     // const functionName = fieldToFunctionMapping[field];
     // if (!functionName) return;
     setLoading(true);
-    const tx = await contract.userSigned(selectedApplication.id);
-    // const tx = await contract.buyerSigned(selectedApplication.id);
+    // const tx = await contract.userSigned(selectedApplication.id); // old 
+    const tx = await contract.buyerSigned(selectedApplication.id); // new
     await tx.wait();
     message.success(`You have accepted the details.`);
     setLoading(false);
@@ -143,24 +143,30 @@ export default function UserVerification() {
         </button>
       )}
       {!selectedApplication ? (
-        <div className="space-y-4 flex items-center flex-col">
+        <div
+          className={
+            signedTokens.length === 0
+              ? 'space-y-4'
+              : 'flex gap-x-[20px] gap-y-[20px] content-center justify-start flex-wrap'
+          }
+        >
           {signedTokens.length === 0 ? (
             <p className="text-center text-lg text-gray-500">No applications</p>
           ) : (
             signedTokens.map((application) => {
               return (
-                  <div
-                    key={application.id.toString()}
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer text-start max-w-fit"
-                    onClick={() => handleApplicationClick(application)}
-                  >
-                    <h3 className="text-xl font-semibold">{application.ownerName}</h3>
-                    <p className="text-gray-600">{application.userAddress}</p>
-                    <p className="text-sm text-gray-500">
-                      Land Area: {application.landArea.toString()}
-                    </p>
-                    <p className="text-sm text-gray-500">Status: {application.status}</p>
-                  </div>
+                <div
+                  key={application.id.toString()}
+                  className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer text-start max-w-fit"
+                  onClick={() => handleApplicationClick(application)}
+                >
+                  <h3 className="text-xl font-semibold">{application.ownerName}</h3>
+                  <p className="text-gray-600">{application.userAddress}</p>
+                  <p className="text-sm text-gray-500">
+                    Land Area: {application.landArea.toString()}
+                  </p>
+                  <p className="text-sm text-gray-500">Status: {application.status}</p>
+                </div>
               );
             })
           )}

@@ -6,12 +6,15 @@ import { UploadOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { ethers } from 'ethers';
 // @ts-ignore
-import CONTRACT_ABI from '../../utils/latestRmcAbi.json';
-// import CONTRACT_ABI from '../../utils/RmcABI.json';
+// import CONTRACT_ABI from '../../utils/latestRmcAbi.json'; //old
+import CONTRACT_ABI from '../../utils/RmcABI.json'; //new
 
 // Contract address
-const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
-// Function to get the contract instance
+
+  // const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9'; // OLD 
+  const CONTRACT_ADDRESS = '0xb25580A1eF44EC72a0F20880BAE87399e90E12Aa'; // NEW
+  
+  // Function to get the contract instance
 export const getContract = async () => {
   try {
     if (!window.ethereum) throw new Error('No crypto wallet found.');
@@ -124,8 +127,8 @@ export default function CertificateIssuer() {
       // console.log({ propertyDetails });
 
       // Call smart contract function
-      const tx = await contract.createByBuilder(propertyDetails, metadatanft);
-      // const tx = await contract.createBy(propertyDetails, metadatanft);
+      // const tx = await contract.createByBuilder(propertyDetails, metadatanft); // old
+      const tx = await contract.createBySeller(propertyDetails, metadatanft); // new
       await tx.wait();
       setLoading(false);
 

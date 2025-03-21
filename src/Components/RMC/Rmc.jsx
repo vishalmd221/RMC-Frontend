@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
-import contractABI from '../../utils/latestRmcAbi.json';
-// import contractABI from '../../utils/RmcABI.json';
+// import contractABI from '../../utils/latestRmcAbi.json'; //old
+import contractABI from '../../utils/RmcABI.json'; // new
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);
@@ -12,8 +12,9 @@ const Rmc = () => {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const { address } = useAccount();
 
+  // const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9'; // OLD
+  const CONTRACT_ADDRESS = '0xb25580A1eF44EC72a0F20880BAE87399e90E12Aa'; // NEW
 
-  const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
   const provider = new ethers.providers.JsonRpcProvider(
     'https://alfajores-forno.celo-testnet.org',
     // 'https://celo-alfajores.infura.io/v3/6dd18219c5be4037b6b52b335a8562f9',
@@ -103,14 +104,20 @@ const Rmc = () => {
       <h2 className="text-3xl font-bold text-center mb-8">Approve Buyer Property details</h2>
       <div className="h-screen p-8 bg-gray-100">
         {!selectedApplication ? (
-          <div className="space-y-4 ">
+          <div
+            className={
+              signedTokens.length === 0
+                ? 'space-y-4'
+                : 'flex gap-x-[20px] gap-y-[20px] content-center justify-start flex-wrap'
+            }
+          >
             {signedTokens.length === 0 ? (
               <p className="text-center text-lg text-gray-500">No applications</p>
             ) : (
               signedTokens.map((app) => (
                 <div
                   key={app.id.toString()}
-                  className={`bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer ${app.isVerifiedByRMC ? 'bg-green-500' : 'bg-white'}`}
+                  className={`bg-white p-4 rounded-lg flex min-h-[150px] min-w-[200px] flex-col justify-center shadow-md hover:shadow-lg cursor-pointer ${app.isVerifiedByRMC ? 'bg-green-500' : 'bg-white'}`}
                   onClick={() => setSelectedApplication(app)}
                 >
                   <h3 className="text-xl font-semibold">{app.ownerName}</h3>
