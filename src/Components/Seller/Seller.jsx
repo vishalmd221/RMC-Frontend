@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
-import { Form, Input, Upload, Button, DatePicker, message, Card } from 'antd';
+import { Form, Input, Upload, Button, DatePicker, message, Card, Select } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { ethers } from 'ethers';
@@ -36,13 +36,17 @@ export default function CertificateIssuer() {
   const [fileList, setFileList] = useState([]);
   const [transactionHash, setTransactionHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const [walletOptions, setWalletOptions] = useState([]);
 
   // Handle file upload
   const handleUpload = (e) => {
     // console.log({ e });
     setFileList(e.target.files[0]);
   };
-
+  useEffect(() => {
+    // Assuming you fetch the wallet list from an API or your application state
+    setWalletOptions(sampleWallets);
+  }, []);
   const onFinish = async (values) => {
     try {
       setLoading(true); // Disable the button when the transaction starts
@@ -123,6 +127,11 @@ export default function CertificateIssuer() {
     }
   };
 
+  const sampleWallets = [
+    { name: 'Kishan Dave', address: '0xbB37Aec1881228890d448b918610Af964956C80d' },
+    { name: 'Vishal Gajjar', address: '0xEB669C54Ec7A4E6eE69025931ab1e2fC2Ff28631' },
+  ];
+
   return (
     <>
       <h2 className="text-3xl font-bold text-center mb-8">RMC Blockchain Certificate Issuer</h2>
@@ -146,11 +155,17 @@ export default function CertificateIssuer() {
               <Input placeholder="Enter Mobile Number" />
             </Form.Item>
             <Form.Item
-              label="Owner Wallet Id"
+              label="Owner Wallet"
               name="ownerWalletId"
-              rules={[{ required: true, message: 'Enter Owner Wallet Id' }]}
+              rules={[{ required: true, message: 'Select an Owner Wallet' }]}
             >
-              <Input placeholder="Enter Owner Wallet Id" />
+              <Select placeholder="Select Owner Wallet">
+                {walletOptions.map((wallet) => (
+                  <Select.Option key={wallet.address} value={wallet.address}>
+                    {wallet.name} ({wallet.address.slice(0, 5)}...{wallet.address.slice(-5)})
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item
               label="Gender"
