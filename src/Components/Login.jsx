@@ -7,7 +7,7 @@ const Login = () => {
   const [userType, setUserType] = useState('Buyer');
   const { login } = useAuth();
 
-  // Static user data based on user type
+  // Static user data based on user type  
   const users = {
     Buyer: [
       { username: 'buyer1', password: 'pass1' },

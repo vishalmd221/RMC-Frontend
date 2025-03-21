@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
 import contractABI from '../../utils/latestRmcAbi.json';
+// import contractABI from '../../utils/RmcABI.json';
 
 const Rmc = () => {
   const [signedTokens, setSignedTokens] = useState([]);

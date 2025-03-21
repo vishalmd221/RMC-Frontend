@@ -7,6 +7,7 @@ import TextArea from 'antd/es/input/TextArea';
 import { ethers } from 'ethers';
 // @ts-ignore
 import CONTRACT_ABI from '../../utils/latestRmcAbi.json';
+// import CONTRACT_ABI from '../../utils/RmcABI.json';
 
 // Contract address
 const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
@@ -95,7 +96,7 @@ export default function CertificateIssuer() {
       if (!contract) return;
       // console.log('Form Data:', values);
 
-      // Convert form data into Solidity `propertyDetails` struct
+      // Convert form data into Solidity `propertyDetails` struct 
       const propertyDetails = {
         Name: values.ownerName,
         Address: values.landAddress,
@@ -110,6 +111,7 @@ export default function CertificateIssuer() {
 
       // Call smart contract function
       const tx = await contract.createByBuilder(propertyDetails, metadatanft);
+      // const tx = await contract.createBy(propertyDetails, metadatanft);
       await tx.wait();
       setLoading(false);
 
@@ -193,15 +195,21 @@ export default function CertificateIssuer() {
             </Form.Item> */}
 
             <Form.Item label="Upload Certificate">
-              {/* <Upload beforeUpload={() => false} fileList={fileList} onChange={handleUpload}>
-                <Button icon={<UpsloadOutlined />}>Click to Upload</Button>
-              </Upload> */}
               <input
-                className="border-[1px] border-[#cfcfcf] border-solid"
+                className="border-[1px] border-[#cfcfcf] border-solid "
                 type="file"
                 onChange={handleUpload}
               />
             </Form.Item>
+            {/* <Form.Item label="Upload Certificate">
+              <Upload
+                beforeUpload={() => false} // Prevents auto-upload
+                onChange={handleUpload}
+                showUploadList={{ showRemoveIcon: false }} // Hide remove button
+              >
+                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+              </Upload>
+            </Form.Item> */}
             <Button
               type="primary"
               htmlType="submit"

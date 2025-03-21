@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { ethers } from 'ethers';
 import CONTRACT_ABI from './latestRmcAbi.json';
+// import CONTRACT_ABI from './RmcABI.json';
 
 const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9';
 
