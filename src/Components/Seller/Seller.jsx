@@ -38,6 +38,7 @@ export default function CertificateIssuer() {
   const [transactionHash, setTransactionHash] = useState('');
   const [loading, setLoading] = useState(false);
   const [walletOptions, setWalletOptions] = useState([]);
+  const [selectedWallet, setSelectedWallet] = useState('');
 
   // Handle file upload
   const handleUpload = (e) => {
@@ -48,11 +49,18 @@ export default function CertificateIssuer() {
     // Assuming you fetch the wallet list from an API or your application state
     setWalletOptions(sampleWallets);
   }, []);
+
+  const onWalletChange = (value) => {
+    setSelectedWallet(value);
+    form.setFieldsValue({ ownerAddress: value }); 
+  };
+
   const onFinish = async (values) => {
     try {
       setLoading(true); // Disable the button when the transaction starts
 
       const formData = new FormData();
+      // console.log(formData, ' formData');
       // console.log(fileList, ' fileList');
       formData.append('file', fileList);
       const response = await fetch('https://rmc-backend-rabl.onrender.com/upload', {
@@ -100,11 +108,12 @@ export default function CertificateIssuer() {
       if (!contract) return;
       // console.log('Form Data:', values);
 
-      // Convert form data into Solidity `propertyDetails` struct 
+      // Convert form data into Solidity `propertyDetails` struct
       const propertyDetails = {
         Name: values.ownerName,
         Address: values.landAddress,
-        ownerAddress: values.ownerWalletAddress,
+        ownerAddress: selectedWallet,
+        // ownerAddress: values.ownerWalletAddress,
         Number: parseInt(values.mobileNumber, 10),
         Gender: values.gender,
         SqFoot: parseInt(values.landArea, 10),
@@ -112,6 +121,7 @@ export default function CertificateIssuer() {
         isSignedByOwner: false,
         isVerifiedByRMC: false,
       };
+      // console.log({ propertyDetails });
 
       // Call smart contract function
       const tx = await contract.createByBuilder(propertyDetails, metadatanft);
@@ -156,12 +166,10 @@ export default function CertificateIssuer() {
             >
               <Input placeholder="Enter Mobile Number" />
             </Form.Item>
-            <Form.Item
-              label="Owner Wallet"
-              name="ownerWalletId"
-              rules={[{ required: true, message: 'Select an Owner Wallet' }]}
-            >
-              <Select placeholder="Select Owner Wallet">
+            {/* Wallet DropDown */}
+
+            <Form.Item label="Owner Wallet Id" name="ownerWalletId" rules={[{ required: true }]}>
+              <Select placeholder="Select Owner Wallet Id" onChange={onWalletChange}>
                 {walletOptions.map((wallet) => (
                   <Select.Option key={wallet.address} value={wallet.address}>
                     {wallet.name} ({wallet.address.slice(0, 5)}...{wallet.address.slice(-5)})
@@ -169,6 +177,8 @@ export default function CertificateIssuer() {
                 ))}
               </Select>
             </Form.Item>
+            {/* Wallet DropDown */}
+
             <Form.Item
               label="Gender"
               name="gender"
@@ -208,7 +218,6 @@ export default function CertificateIssuer() {
             >
               <Input placeholder="Enter Metadata Hash" />
             </Form.Item> */}
-
             <Form.Item label="Upload Certificate">
               <input
                 className="border-[1px] border-[#cfcfcf] border-solid "
