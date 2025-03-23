@@ -28,9 +28,14 @@ export default function UserVerification() {
   const [isLoadingField, setIsLoadingField] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [transactionHash, setTransactionHash] = useState('');
+  const [isTransactionComplete, setIsTransactionComplete] = useState(false);
+
   const { address } = useAccount();
+
   const handleApplicationClick = (application) => {
     setSelectedApplication(application);
+    setTransactionHash('');
   };
 
   const fetchImage = async (tokenURI) => {
@@ -43,85 +48,97 @@ export default function UserVerification() {
       return error;
     }
   };
-  useEffect(() => {
-    // Dummy application data for the RMC to review
 
-    const contract = getContractInstance();
-    const getSignedTokenDetails = async () => {
-      try {
-        // Step 1: Fetch all token IDs
-        setLoading(true);
-        const allTokenIds = await contract.getAllTokenIds();
-        // console.log({ allTokenIds });
-        const signedTokens = [];
-        for (let i = 0; i < allTokenIds.length; i++) {
-          const tokenId = allTokenIds[i];
-          const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
-          // console.log({ tokenDetails });
-          // const tokenDetailsPlainObject = Object.fromEntries(Object.entries(tokenDetails));
-          // console.log(tokenDetails[2].toString() === address.toString());
-          // console.log({ address });
-          // console.log(tokenDetails[2].toString().toLowerCase());
-          if (tokenDetails[2]?.toString().toLowerCase() === address?.toString().toLowerCase()) {
-            const image = await contract.tokenURI(tokenId.toString());
-            const getimage = await fetchImage(image);
-            signedTokens.push({
-              id: tokenId,
-              ownerName: tokenDetails[0],
-              userAddress: tokenDetails[2],
-              houseAddress: tokenDetails[1],
-              // number: tokenDetails[3],
-              gender: tokenDetails[4],
-              landArea: tokenDetails[5],
-              pancard: tokenDetails[6],
-              mobileNumber: parseInt(tokenDetails[3], 10),
-              imageUrl: getimage,
-              status: tokenDetails[7] === true ? 'Signed' : 'Pending', // Initially status is 'Pending'
-            });
-          }
+  // Dummy application data for the RMC to review
+
+  const contract = getContractInstance();
+  const getSignedTokenDetails = async () => {
+    try {
+      // Step 1: Fetch all token IDs
+      setLoading(true);
+      const allTokenIds = await contract.getAllTokenIds();
+      const signedTokens = [];
+      for (let i = 0; i < allTokenIds.length; i++) {
+        const tokenId = allTokenIds[i];
+        const tokenDetails = await contract.tokenIdDetails(tokenId.toString());
+
+        if (tokenDetails[2]?.toString().toLowerCase() === address?.toString().toLowerCase()) {
+          const image = await contract.tokenURI(tokenId.toString());
+          const getimage = await fetchImage(image);
+          signedTokens.push({
+            id: tokenId,
+            ownerName: tokenDetails[0],
+            userAddress: tokenDetails[2],
+            houseAddress: tokenDetails[1],
+            // number: tokenDetails[3],
+            gender: tokenDetails[4],
+            landArea: tokenDetails[5],
+            pancard: tokenDetails[6],
+            mobileNumber: parseInt(tokenDetails[3], 10),
+            imageUrl: getimage,
+            isSignedByOwner: tokenDetails[7],
+            status: tokenDetails[7] === true ? 'Signed' : 'Pending',
+          });
         }
-        // console.log({signedTokens});
-        // Step 4: Set the filtered signed tokens in the state
-        setSignedTokens(signedTokens);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching signed token details:', error);
-        setLoading(false);
       }
-    };
+      setSignedTokens(signedTokens);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching signed token details:', error);
+      setLoading(false);
+    }
+  };
 
-    getSignedTokenDetails();
+  useEffect(() => {
+    if (address) {
+      getSignedTokenDetails();
+    }
   }, [address]);
 
   const handleVerify = async (field) => {
     setIsLoadingField(true);
     try {
-      // setVerification((prev) => ({ ...prev, [field]: status }));
       const contract = await getContract();
-      // console.log({ contract });
 
       const functionName = fieldToFunctionMapping[field];
       if (!functionName) return;
 
       await contract[functionName](selectedApplication.id, selectedApplication[field]);
-      // console.log({ contract, field });
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoadingField(false);
     }
   };
-
   const handleFinalDecision = async () => {
-    const contract = await getContract();
-    // const functionName = fieldToFunctionMapping[field];
-    // if (!functionName) return;
-    setLoading(true);
-    // const tx = await contract.userSigned(selectedApplication.id); // old 
-    const tx = await contract.buyerSigned(selectedApplication.id); // new
-    await tx.wait();
-    message.success(`You have accepted the details.`);
-    setLoading(false);
+    try {
+      setIsLoadingField(true);
+      const contract = await getContract();
+      const tx = await contract.buyerSigned(selectedApplication.id); // new
+      await tx.wait();
+      setTransactionHash(tx.hash);
+      setSelectedApplication((prev) => ({ ...prev, status: 'Signed' }));
+
+      // Update selectedApplication state to reflect verification
+      setSelectedApplication((prev) => ({
+        ...prev,
+        isSignedByOwner: true, // Mark as verified
+      }));
+      setSignedTokens((prevTokens) =>
+        prevTokens.map((token) =>
+          token.id.toString() === selectedApplication.id.toString()
+            ? { ...token, isSignedByOwner: true }
+            : token,
+        ),
+      );
+
+      setIsTransactionComplete(true);
+      message.success(`You have accepted the details.`);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingField(false);
+    }
   };
 
   if (loading) {
@@ -132,7 +149,6 @@ export default function UserVerification() {
       </div>
     );
   }
-  // console.log({ selectedApplication, signedTokens });
 
   return (
     <>
@@ -165,7 +181,9 @@ export default function UserVerification() {
                   <p className="text-sm text-gray-500">
                     Land Area: {application.landArea.toString()}
                   </p>
-                  <p className="text-sm text-gray-500">Status: {application.status}</p>
+                  <p className="text-sm text-gray-500">
+                    Status: {application.isSignedByOwner ? 'Signed' : 'Pending'}
+                  </p>
                 </div>
               );
             })
@@ -176,7 +194,13 @@ export default function UserVerification() {
           <Card className="w-full max-w-lg shadow-lg bg-gray-900 p-6 rounded-2xl">
             <h2 className="text-2xl font-semibold text-center mb-6">Verify Property Details</h2>
             {Object.entries(selectedApplication).map(([key, value]) => {
-              if (key === 'id' || key === 'userAddress' || key === 'status') return;
+              if (
+                key === 'id' ||
+                key === 'userAddress' ||
+                key === 'status' ||
+                key === 'isSignedByOwner'
+              )
+                return;
 
               return (
                 <div key={key} className="mb-4 p-3 bg-[#f8f8f8] rounded-lg">
@@ -208,7 +232,11 @@ export default function UserVerification() {
                         }}
                         className="mt-2"
                         rows={2}
-                        disabled={key === 'landArea' || selectedApplication?.status === 'Signed'}
+                        disabled={
+                          key === 'landArea' ||
+                          selectedApplication?.status === 'Signed' ||
+                          isTransactionComplete
+                        }
                       />
                     </>
                   )}
@@ -217,6 +245,7 @@ export default function UserVerification() {
                       icon={<CheckCircleOutlined />}
                       onClick={() => handleVerify(key)}
                       disabled={
+                        isTransactionComplete ||
                         isLoadingField ||
                         key === 'landArea' ||
                         key === 'imageUrl' ||
@@ -234,7 +263,11 @@ export default function UserVerification() {
                 type="primary"
                 className="w-full"
                 onClick={() => handleFinalDecision()}
-                disabled={isLoadingField || selectedApplication?.status === 'Signed'}
+                disabled={
+                  isTransactionComplete ||
+                  isLoadingField ||
+                  selectedApplication?.status === 'Signed'
+                }
               >
                 Accept All & Sign
               </Button>
@@ -242,7 +275,21 @@ export default function UserVerification() {
             {selectedApplication?.status === 'Signed' && (
               <p> Document is already Verified by Buyer {address} </p>
             )}
-
+            {transactionHash && (
+              <div className="mt-6 p-4 bg-white-700 rounded-lg text-center">
+                <p className="text-green-400">Document is Signed On Blockchain!</p>
+                <p className="text-sm break-all">
+                  <a
+                    href={`https://alfajores.celoscan.io/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    View Transaction on Explorer
+                  </a>
+                </p>
+              </div>
+            )}
             {finalDecision && (
               <div className="mt-6 p-4 bg-[#f8f8f8] rounded-lg text-center">
                 <p

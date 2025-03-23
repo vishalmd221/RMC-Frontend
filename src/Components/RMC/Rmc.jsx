@@ -10,10 +10,18 @@ const Rmc = () => {
   const [approving, setApproving] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+  const [transactionHash, setTransactionHash] = useState('');
+
   const { address } = useAccount();
 
+  const handleApplicationClick = (app) => {
+    setSelectedApplication(app);
+    setTransactionHash('');
+  };
   // const CONTRACT_ADDRESS = '0x13697f35172Ec534315Cb8c7DA65E4f075262bD9'; // OLD
-  const CONTRACT_ADDRESS = '0xb25580A1eF44EC72a0F20880BAE87399e90E12Aa'; // NEW
+  // const CONTRACT_ADDRESS = '0xb25580A1eF44EC72a0F20880BAE87399e90E12Aa'; // semi NEW
+  const CONTRACT_ADDRESS = '0x9133e2835A2cc49ffEa588b56Feb412588E81045'; // NEW
 
   const provider = new ethers.providers.JsonRpcProvider(
     'https://alfajores-forno.celo-testnet.org',
@@ -38,8 +46,8 @@ const Rmc = () => {
               return {
                 id: tokenId,
                 ownerName: tokenDetails[0],
-                userAddress: tokenDetails[1],
-                houseAddress: tokenDetails[2],
+                userAddress: tokenDetails[2],
+                houseAddress: tokenDetails[1],
                 gender: tokenDetails[4],
                 landArea: tokenDetails[5],
                 pancard: tokenDetails[6],
@@ -72,26 +80,34 @@ const Rmc = () => {
   };
 
   const handleApprove = async (tokenId) => {
-    setApproving(true);
     try {
+      setApproving(true);
       const newProvider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = await newProvider.getSigner();
       const contractWithSigner = new ethers.Contract(CONTRACT_ADDRESS, contractABI).connect(signer);
       const tx = await contractWithSigner.rmcApproved(tokenId);
-
-      // const signerContract = await getSignerContract();
-      // const tx = await contractWithSigner.rmcApproved(tokenId);
       await tx.wait();
+      setTransactionHash(tx.hash);
+
+      // Update selectedApplication state to reflect verification
+      setSelectedApplication((prev) => ({
+        ...prev,
+        isVerifiedByRMC: true, // Mark as verified
+      }));
+      // Update signedTokens array
+      setSignedTokens((prevTokens) =>
+        prevTokens.map((token) =>
+          token.id === tokenId ? { ...token, isVerifiedByRMC: true } : token,
+        ),
+      );
+
       alert(`Application for ${selectedApplication.ownerName} has been approved.`);
-      setSelectedApplication((prev) => ({ ...prev, status: 'Approved' }));
-      setApproving(false);
     } catch (error) {
       console.error('Transaction failed:', error);
-      alert(error.data.message);
+    } finally {
       setApproving(false);
     }
   };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -117,11 +133,11 @@ const Rmc = () => {
               signedTokens.map((app) => (
                 <div
                   key={app.id.toString()}
-                  className={`bg-white p-4 rounded-lg flex min-h-[150px] min-w-[200px] flex-col justify-center shadow-md hover:shadow-lg cursor-pointer ${app.isVerifiedByRMC ? 'bg-green-500' : 'bg-white'}`}
-                  onClick={() => setSelectedApplication(app)}
+                  className={`bg-white p-4 max-w-[300px] rounded-lg flex min-h-[150px] min-w-[200px] flex-col justify-center shadow-md hover:shadow-lg cursor-pointer ${app.isVerifiedByRMC ? 'bg-green-500' : 'bg-white'}`}
+                  onClick={() => handleApplicationClick(app)}
                 >
                   <h3 className="text-xl font-semibold">{app.ownerName}</h3>
-                  <p className="text-gray-600">{app.userAddress}</p>
+                  <p className="text-gray-600">{app.houseAddress}</p>
                   <p className="text-sm text-gray-500">Land Area: {app.landArea.toString()}</p>
                   <p className="text-sm text-gray-500">
                     Status: {app.isVerifiedByRMC ? 'Verified' : 'Pending'}
@@ -133,7 +149,7 @@ const Rmc = () => {
         ) : (
           <div className="mt-8 p-6 bg-white rounded-lg shadow-lg">
             <button onClick={() => setSelectedApplication(null)} className="text-blue-50 mb-4">
-              Back to Application List
+              Back
             </button>
             <h2 className="text-2xl font-semibold">Application Details</h2>
             <div className="mt-4 flex justify-around items-center">
@@ -154,7 +170,7 @@ const Rmc = () => {
                   <strong>PAN Card:</strong> {selectedApplication.pancard}
                 </p>
                 <p>
-                  <strong>House Address:</strong> {selectedApplication.userAddress}
+                  <strong>House Address:</strong> {selectedApplication.houseAddress}
                 </p>
                 <p>
                   <strong>Mobile Number :</strong> {selectedApplication.mobileNumber}
@@ -173,8 +189,12 @@ const Rmc = () => {
             <div className="mt-6 flex justify-center">
               <button
                 onClick={() => handleApprove(selectedApplication.id)}
-                className={`px-6 py-2 rounded-md ${selectedApplication.isVerifiedByRMC || approving ? '!bg-gray-500 !cursor-not-allowed' : 'bg-green-500 hover:bg-green-600 '} text-white`}
-                disabled={selectedApplication.isVerifiedByRMC && approving}
+                className={`px-6 py-2 rounded-md ${
+                  selectedApplication.isVerifiedByRMC || approving
+                    ? '!bg-gray-500 !cursor-not-allowed'
+                    : 'bg-green-500 hover:bg-green-600'
+                } text-white`}
+                disabled={selectedApplication.isVerifiedByRMC === true || approving === true}
               >
                 {selectedApplication.isVerifiedByRMC
                   ? 'Already Verified'
@@ -186,6 +206,22 @@ const Rmc = () => {
             <p className="mt-2 text-sm text-gray-500">
               Status: {selectedApplication.isVerifiedByRMC ? 'Verified' : 'Pending'}
             </p>
+
+            {transactionHash && (
+              <div className="mt-6 p-4 bg-white-700 rounded-lg text-center">
+                <p className="text-green-400">Document is Signed On Blockchain!</p>
+                <p className="text-sm break-all">
+                  <a
+                    href={`https://alfajores.celoscan.io/tx/${transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 underline"
+                  >
+                    View Transaction on Explorer
+                  </a>
+                </p>
+              </div>
+            )}
           </div>
         )}
 
